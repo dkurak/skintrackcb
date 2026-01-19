@@ -41,7 +41,6 @@ export interface TourResponse {
     has_beacon: boolean;
     has_probe: boolean;
     has_shovel: boolean;
-    show_on_tours: boolean;
   };
 }
 
@@ -222,8 +221,7 @@ export async function getTourResponses(tourId: string): Promise<TourResponse[]> 
         experience_level,
         has_beacon,
         has_probe,
-        has_shovel,
-        show_on_tours
+        has_shovel
       )
     `)
     .eq('tour_id', tourId)
@@ -237,7 +235,7 @@ export async function getTourResponses(tourId: string): Promise<TourResponse[]> 
   return data as TourResponse[];
 }
 
-// Get accepted participants for a tour (public view - respects show_on_tours setting)
+// Get accepted participants for a tour (public view)
 export async function getTourParticipants(tourId: string): Promise<TourParticipant[]> {
   if (!supabase) return [];
 
@@ -247,8 +245,7 @@ export async function getTourParticipants(tourId: string): Promise<TourParticipa
       user_id,
       profiles (
         display_name,
-        experience_level,
-        show_on_tours
+        experience_level
       )
     `)
     .eq('tour_id', tourId)
@@ -259,22 +256,16 @@ export async function getTourParticipants(tourId: string): Promise<TourParticipa
     return [];
   }
 
-  // Filter to only those who have show_on_tours enabled (default true)
   // Cast profiles to handle Supabase's nested object typing
-  type ProfileData = { display_name: string | null; experience_level: string | null; show_on_tours: boolean | null };
-  return (data || [])
-    .filter(r => {
-      const profile = r.profiles as unknown as ProfileData | null;
-      return profile?.show_on_tours !== false;
-    })
-    .map(r => {
-      const profile = r.profiles as unknown as ProfileData | null;
-      return {
-        user_id: r.user_id,
-        display_name: profile?.display_name || null,
-        experience_level: profile?.experience_level || null,
-      };
-    });
+  type ProfileData = { display_name: string | null; experience_level: string | null };
+  return (data || []).map(r => {
+    const profile = r.profiles as unknown as ProfileData | null;
+    return {
+      user_id: r.user_id,
+      display_name: profile?.display_name || null,
+      experience_level: profile?.experience_level || null,
+    };
+  });
 }
 
 // Create a response to a tour post
