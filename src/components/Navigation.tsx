@@ -3,17 +3,24 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/lib/auth';
 
 const navItems = [
-  { href: '/', label: 'Dashboard' },
+  { href: '/', label: 'Forecast' },
   { href: '/history', label: 'History' },
   { href: '/weather', label: 'Weather' },
-  { href: '/observations', label: 'Observations' },
+  { href: '/partners', label: 'Partners' },
 ];
 
 export function Navigation() {
   const pathname = usePathname();
+  const { user, profile, loading } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+
+  const isActive = (href: string) => {
+    if (href === '/') return pathname === '/';
+    return pathname.startsWith(href);
+  };
 
   return (
     <nav className="bg-gray-900 text-white">
@@ -24,13 +31,13 @@ export function Navigation() {
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex gap-1">
+          <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  pathname === item.href
+                  isActive(item.href)
                     ? 'bg-gray-700 text-white'
                     : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                 }`}
@@ -38,6 +45,31 @@ export function Navigation() {
                 {item.label}
               </Link>
             ))}
+
+            {/* User menu */}
+            <div className="ml-2 pl-2 border-l border-gray-700">
+              {loading ? (
+                <span className="text-gray-500 text-sm">...</span>
+              ) : user ? (
+                <Link
+                  href="/profile"
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    pathname === '/profile'
+                      ? 'bg-gray-700 text-white'
+                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  }`}
+                >
+                  {profile?.display_name || 'Profile'}
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+                >
+                  Sign In
+                </Link>
+              )}
+            </div>
           </div>
 
           {/* Mobile hamburger button */}
@@ -65,7 +97,7 @@ export function Navigation() {
                 href={item.href}
                 onClick={() => setIsOpen(false)}
                 className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                  pathname === item.href
+                  isActive(item.href)
                     ? 'bg-gray-700 text-white'
                     : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                 }`}
@@ -73,6 +105,31 @@ export function Navigation() {
                 {item.label}
               </Link>
             ))}
+
+            {/* User link in mobile menu */}
+            <div className="pt-2 mt-2 border-t border-gray-700">
+              {loading ? null : user ? (
+                <Link
+                  href="/profile"
+                  onClick={() => setIsOpen(false)}
+                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                    pathname === '/profile'
+                      ? 'bg-gray-700 text-white'
+                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  }`}
+                >
+                  {profile?.display_name || 'Profile'}
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+                >
+                  Sign In
+                </Link>
+              )}
+            </div>
           </div>
         )}
       </div>
