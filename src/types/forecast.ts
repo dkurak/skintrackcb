@@ -68,7 +68,7 @@ export interface AvalancheProblem {
   type: ProblemType;
   aspect_elevation: AspectElevationRose;
   likelihood: 'Unlikely' | 'Possible' | 'Likely' | 'Very Likely' | 'Almost Certain';
-  size: 'D1' | 'D1.5' | 'D2' | 'D2.5' | 'D3' | 'D3.5' | 'D4' | 'D4.5' | 'D5';
+  size: string; // e.g., 'D2', 'D1-2', 'D2-D3'
   details?: string;
 }
 
