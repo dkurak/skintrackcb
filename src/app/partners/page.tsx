@@ -145,31 +145,11 @@ export default function PartnersPage() {
         )}
       </div>
 
-      {/* Filters */}
-      <div className="space-y-3">
-        {/* Time and My Tours filter */}
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => { setTimeFrame('upcoming'); setShowMyTours(false); }}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              timeFrame === 'upcoming' && !showMyTours
-                ? 'bg-gray-900 text-white'
-                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-            }`}
-          >
-            Upcoming
-          </button>
-          <button
-            onClick={() => { setTimeFrame('past'); setShowMyTours(false); }}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              timeFrame === 'past' && !showMyTours
-                ? 'bg-gray-900 text-white'
-                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-            }`}
-          >
-            Past
-          </button>
-          {user && (
+      {/* Filters - single row */}
+      <div className="flex flex-wrap items-center gap-2">
+        {/* My Tours (when logged in) */}
+        {user && (
+          <>
             <button
               onClick={() => { setShowMyTours(true); setTimeFrame('all'); }}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -180,41 +160,43 @@ export default function PartnersPage() {
             >
               My Tours
             </button>
-          )}
-        </div>
+            <span className="text-gray-300">|</span>
+          </>
+        )}
 
-        {/* Zone filter */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => setSelectedZone(null)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              selectedZone === null
-                ? 'bg-gray-200 text-gray-900'
-                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-            }`}
+        {/* Time filters */}
+        <button
+          onClick={() => { setTimeFrame('upcoming'); setShowMyTours(false); }}
+          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            timeFrame === 'upcoming' && !showMyTours
+              ? 'bg-gray-900 text-white'
+              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+          }`}
+        >
+          Upcoming
+        </button>
+        <button
+          onClick={() => { setTimeFrame('past'); setShowMyTours(false); }}
+          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            timeFrame === 'past' && !showMyTours
+              ? 'bg-gray-900 text-white'
+              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+          }`}
+        >
+          Past
+        </button>
+
+        {/* Zone dropdown */}
+        <div className="ml-auto">
+          <select
+            value={selectedZone || ''}
+            onChange={(e) => setSelectedZone(e.target.value || null)}
+            className="px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            All Zones
-          </button>
-          <button
-            onClick={() => setSelectedZone('southeast')}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              selectedZone === 'southeast'
-                ? 'bg-gray-200 text-gray-900'
-                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-            }`}
-          >
-            Southeast
-          </button>
-          <button
-            onClick={() => setSelectedZone('northwest')}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              selectedZone === 'northwest'
-                ? 'bg-gray-200 text-gray-900'
-                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-            }`}
-          >
-            Northwest
-          </button>
+            <option value="">All Zones</option>
+            <option value="southeast">Southeast</option>
+            <option value="northwest">Northwest</option>
+          </select>
         </div>
       </div>
 
