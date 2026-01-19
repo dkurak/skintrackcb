@@ -9,7 +9,7 @@ const navItems = [
   { href: '/', label: 'Forecast' },
   { href: '/history', label: 'History' },
   { href: '/weather', label: 'Weather' },
-  { href: '/partners', label: 'Partners' },
+  { href: '/partners', label: 'Tours' },
 ];
 
 export function Navigation() {
@@ -48,9 +48,7 @@ export function Navigation() {
 
             {/* User menu */}
             <div className="ml-2 pl-2 border-l border-gray-700">
-              {loading ? (
-                <span className="text-gray-500 text-sm">...</span>
-              ) : user ? (
+              {loading ? null : user ? (
                 <Link
                   href="/profile"
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
