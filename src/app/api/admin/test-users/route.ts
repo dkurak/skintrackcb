@@ -112,6 +112,7 @@ export async function POST(request: NextRequest) {
             preferred_zones: Math.random() > 0.3 ? ['southeast', 'northwest'] : ['southeast'],
             looking_for_partners: Math.random() > 0.3,
             typical_start_time: ['6:00 AM', '6:30 AM', '7:00 AM', 'Dawn', '8:00 AM'][Math.floor(Math.random() * 5)],
+            show_on_tours: true,
           })
           .eq('id', authUser.user.id);
 
@@ -314,25 +315,66 @@ async function createSampleTours() {
     }
 
     // Add some responses to tours
-    if (createdTour && i < 6) {
-      // Add 1-3 responses from other test users
-      const responders = testUsers.filter(u => u.id !== user.id).slice(0, Math.floor(Math.random() * 3) + 1);
+    if (createdTour) {
+      const otherUsers = testUsers.filter(u => u.id !== user.id);
 
-      for (const responder of responders) {
-        await supabaseAdmin
-          .from('tour_responses')
-          .insert({
-            tour_id: createdTour.id,
-            user_id: responder.id,
-            message: [
-              'Interested! I have all the gear and experience.',
-              'This sounds great, count me in if there\'s room.',
-              'I\'d love to join. Free that day.',
-              'Perfect timing for me. Let me know!',
-            ][Math.floor(Math.random() * 4)],
-            status: i < 2 ? 'accepted' : 'pending', // Accepted for full tours
-          });
+      if (i < 2) {
+        // Full tours: add accepted responses equal to spots_available
+        const acceptedResponders = otherUsers.slice(0, tour.spots);
+        for (const responder of acceptedResponders) {
+          await supabaseAdmin
+            .from('tour_responses')
+            .insert({
+              tour_id: createdTour.id,
+              user_id: responder.id,
+              message: [
+                'Interested! I have all the gear and experience.',
+                'This sounds great, count me in if there\'s room.',
+              ][Math.floor(Math.random() * 2)],
+              status: 'accepted',
+            });
+        }
+      } else if (i < 5) {
+        // Some open tours: add 1-2 accepted responses (partially filled)
+        const numAccepted = Math.min(i - 1, tour.spots - 1); // 1 or 2 accepted, leaving room
+        const acceptedResponders = otherUsers.slice(0, numAccepted);
+        for (const responder of acceptedResponders) {
+          await supabaseAdmin
+            .from('tour_responses')
+            .insert({
+              tour_id: createdTour.id,
+              user_id: responder.id,
+              message: 'I\'d love to join. Free that day.',
+              status: 'accepted',
+            });
+        }
+        // Also add some pending responses
+        const pendingResponders = otherUsers.slice(numAccepted, numAccepted + 2);
+        for (const responder of pendingResponders) {
+          await supabaseAdmin
+            .from('tour_responses')
+            .insert({
+              tour_id: createdTour.id,
+              user_id: responder.id,
+              message: 'Perfect timing for me. Let me know!',
+              status: 'pending',
+            });
+        }
+      } else if (i < 7) {
+        // Some tours with only pending responses
+        const pendingResponders = otherUsers.slice(0, 2);
+        for (const responder of pendingResponders) {
+          await supabaseAdmin
+            .from('tour_responses')
+            .insert({
+              tour_id: createdTour.id,
+              user_id: responder.id,
+              message: 'This sounds great, count me in if there\'s room.',
+              status: 'pending',
+            });
+        }
       }
+      // Last tour has no responses
     }
   }
 }
