@@ -154,7 +154,13 @@ export default function TourPostPage() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{post.title}</h1>
             <p className="text-gray-500 mt-1">
-              Posted by {post.profiles?.display_name || 'Anonymous'}
+              Posted by{' '}
+              <Link
+                href={`/profile/${post.user_id}`}
+                className="text-blue-600 hover:text-blue-800"
+              >
+                {post.profiles?.display_name || 'Anonymous'}
+              </Link>
               {post.profiles?.experience_level && (
                 <span className="ml-2">
                   ({EXPERIENCE_LABELS[post.profiles.experience_level]})
@@ -215,9 +221,10 @@ export default function TourPostPage() {
             </h2>
             <div className="flex flex-wrap gap-2">
               {participants.map((participant) => (
-                <div
+                <Link
                   key={participant.user_id}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full"
+                  href={`/profile/${participant.user_id}`}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full hover:bg-green-100 transition-colors"
                 >
                   <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                   <span className="text-sm font-medium text-green-800">
@@ -228,7 +235,7 @@ export default function TourPostPage() {
                       ({EXPERIENCE_LABELS[participant.experience_level]})
                     </span>
                   )}
-                </div>
+                </Link>
               ))}
             </div>
           </div>
