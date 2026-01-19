@@ -18,7 +18,7 @@ export function Navigation() {
       <div className="max-w-4xl mx-auto px-4">
         <div className="flex items-center justify-between h-14">
           <Link href="/" className="font-bold text-lg">
-            CBAC Tracker
+            SkinTrack CB
           </Link>
           <div className="flex gap-1">
             {navItems.map((item) => (

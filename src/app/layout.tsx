@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CBAC Forecast Tracker",
-  description: "Historical avalanche forecast data from the Crested Butte Avalanche Center",
+  title: "SkinTrack CB - Crested Butte Backcountry",
+  description: "Avalanche forecasts and conditions for Crested Butte backcountry touring. Data from CBAC.",
 };
 
 export default function RootLayout({

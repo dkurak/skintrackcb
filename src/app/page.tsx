@@ -331,7 +331,7 @@ function DashboardContent() {
       {/* Data source notice */}
       <div className="text-center py-2 text-sm text-gray-400">
         {isSupabaseConfigured
-          ? `Showing ${forecasts.length} days of CBAC forecast data`
+          ? <>Forecast data from <a href="https://cbavalanchecenter.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Crested Butte Avalanche Center</a>. Not affiliated with CBAC.</>
           : 'Demo mode - Using mock data. Connect Supabase to see real forecasts.'}
       </div>
     </div>
