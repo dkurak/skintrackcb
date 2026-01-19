@@ -39,7 +39,10 @@ export default function TourPostPage() {
   const [success, setSuccess] = useState<string | null>(null);
 
   const isOwner = user && post && user.id === post.user_id;
-  const hasResponded = responses.some((r) => r.user_id === user?.id);
+  const userResponse = responses.find((r) => r.user_id === user?.id);
+  const isAccepted = userResponse?.status === 'accepted';
+  const isPending = userResponse?.status === 'pending';
+  const hasResponded = !!userResponse;
 
   useEffect(() => {
     async function loadData() {
@@ -299,11 +302,34 @@ export default function TourPostPage() {
         )}
       </div>
 
-      {/* Express interest (for non-owners) */}
-      {!isOwner && !isPast && post.status === 'open' && (
+      {/* You're In! (for accepted participants) */}
+      {!isOwner && isAccepted && (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-2xl">✓</span>
+            <h2 className="text-lg font-semibold text-green-800">You&apos;re In!</h2>
+          </div>
+          <p className="text-green-700">
+            You&apos;ve been accepted to this tour. Check back for updates from the organizer.
+          </p>
+        </div>
+      )}
+
+      {/* Pending response */}
+      {!isOwner && isPending && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-yellow-800 mb-2">Interest Submitted</h2>
+          <p className="text-yellow-700">
+            Your request is pending. The organizer will review and respond.
+          </p>
+        </div>
+      )}
+
+      {/* Express interest (for non-owners who haven't responded) */}
+      {!isOwner && !isPast && !hasResponded && post.status === 'open' && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            {hasResponded ? 'Interest Submitted' : 'Interested in Joining?'}
+            Interested in Joining?
           </h2>
 
           {error && (
@@ -318,11 +344,7 @@ export default function TourPostPage() {
             </div>
           )}
 
-          {hasResponded ? (
-            <p className="text-gray-600">
-              You&apos;ve already expressed interest in this tour. The organizer will reach out if they&apos;d like you to join.
-            </p>
-          ) : user ? (
+          {user ? (
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
