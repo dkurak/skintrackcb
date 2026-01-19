@@ -1,0 +1,42 @@
+[
+  {
+    "id": "2987",
+    "zone": "northwest",
+    "zone_name": "Northwest Mountains",
+    "center": "Crested Butte Avalanche Center",
+    "issue_date": "2026-01-19",
+    "valid_date": "2026-01-19",
+    "expires_date": "2026-01-20",
+    "danger_level": 2,
+    "danger_text": "moderate",
+    "danger_alpine": 2,
+    "danger_treeline": 2,
+    "danger_below_treeline": 1,
+    "travel_advice": "Heightened avalanche conditions on specific terrain features. Evaluate snow and terrain carefully; identify features of concern.",
+    "bottom_line": "Heightened avalanche conditions on specific terrain features. Evaluate snow and terrain carefully; identify features of concern.",
+    "discussion": "Detailed forecast discussion available at CBAC website.",
+    "problems": [],
+    "forecast_url": "https://cbavalanchecenter.org/forecasts/#/northwest-mountains",
+    "created_at": "2026-01-19T06:05:16.376548"
+  },
+  {
+    "id": "2988",
+    "zone": "southeast",
+    "zone_name": "Southeast Mountains",
+    "center": "Crested Butte Avalanche Center",
+    "issue_date": "2026-01-19",
+    "valid_date": "2026-01-19",
+    "expires_date": "2026-01-20",
+    "danger_level": 2,
+    "danger_text": "moderate",
+    "danger_alpine": 2,
+    "danger_treeline": 2,
+    "danger_below_treeline": 1,
+    "travel_advice": "Heightened avalanche conditions on specific terrain features. Evaluate snow and terrain carefully; identify features of concern.",
+    "bottom_line": "Heightened avalanche conditions on specific terrain features. Evaluate snow and terrain carefully; identify features of concern.",
+    "discussion": "Detailed forecast discussion available at CBAC website.",
+    "problems": [],
+    "forecast_url": "https://cbavalanchecenter.org/forecasts/#/southeast-mountains",
+    "created_at": "2026-01-19T06:05:16.376562"
+  }
+]

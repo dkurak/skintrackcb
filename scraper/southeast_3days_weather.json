@@ -1,0 +1,359 @@
+[
+  {
+    "zone": "southeast",
+    "zone_name": "Southeast Mountains",
+    "issue_date": "2026-01-19",
+    "valid_date": "2026-01-19",
+    "danger_alpine": 2,
+    "danger_treeline": 2,
+    "danger_below_treeline": 1,
+    "bottom_line": "Most slopes are adjusting to the ongoing dry spell, but not all terrain has fully stabilized. Expect stubborn wind slabs on recently drifted slopes, and give yourself a cautious margin on the shady side of the compass near and above treeline where a low-probability persistent slab could still break deeper and wider.  The safest and highest quality riding is in wind-protected terrain at lower elevations.",
+    "discussion": "There are two flavors of slab problems to manage in the backcountry right now. The first is relatively small and easy to recognize on the snow surface.  Last week's northerly winds formed thin, hard slabs over the fragile snow surface that is our current January dryspell weak layer.  As this problem was developing last week, skiers and riders triggered five D1 to D1.5 wind slab avalanches on east and northeast aspects near and below treeline, with a few natural avalanches on high-elevation southerly aspects. The broad distribution reflects northerly winds mixing into lower elevations and blowing across the terrain that was holding onto dry, soft snow available for transport.  Now that these drifts have stiffened, they've become stubborn to trigger but are expected to persist because they formed over facets. This problem is also self-policing, as the best riding conditions are found on wind-protected or wind-eroded slopes where slabs are absent.",
+    "problems": [
+      {
+        "problem_number": 1,
+        "problem_type": "persistent_slab",
+        "likelihood": "Possible",
+        "size": "D2",
+        "aspect_elevation_rose": {
+          "N": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "NE": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "E": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SE": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "S": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SW": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "W": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "NW": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          }
+        },
+        "details": "A large persistent slab on a wind-loaded slope near Crystal Peak that likely ran around January 10th during a previous wind event."
+      },
+      {
+        "problem_number": 2,
+        "problem_type": "wind_slab",
+        "likelihood": "Possible",
+        "size": "D2",
+        "aspect_elevation_rose": {
+          "N": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "NE": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "E": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SE": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "S": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SW": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "W": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "NW": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          }
+        },
+        "details": "In this skier-triggered wind slab from last week, you can see where the slab formed on the lee or cross-loaded side of the subtle ridge line. To the lookers' right and left of the slab, you can see wind erosion with some raised tracks. There are two flavors of slab problems to manage in the backcountry right now. The second problem is less common but carries more serious consequences and should remain at the forefront of your decision-making.   Slabs breaking several feet thick on December and November weak layers have become increasingly isolated and are now considered unlikely as our dry spell continues. It has been 11 days since we had measurable snowfall, and more and more slopes are finding equilibrium without ongoing loading.  Persistent slab activity over the past week has been limited to a few explosive results, one very large natural just outside our forecast boundary, and a smaller step-down avalanche that began as a skier-triggered wind slab.  Last week's wind events eroded "
+      }
+    ],
+    "forecast_url": "https://cbavalanchecenter.org/forecasts/#/southeast-mountains",
+    "weather": {
+      "summary": "Colorado remains stuck in northwest flow between a stagnant high-pressure ridge over California and a stagnant trough over the Great Lakes.  Dry and mild weather continues for the next few days, with temperatures rising into the 20's under light to moderate alpine winds.  Hope is on the horizon, as the trough is expected to dig deep enough to deliver some snowfall by the end of the week.  It won't be a blockbuster storm, but we'll take whatever we can get. Southeast Mountains Last Night (5PM - 5",
+      "full_text": "Colorado remains stuck in northwest flow between a stagnant high-pressure ridge over California and a stagnant trough over the Great Lakes.  Dry and mild weather continues for the next few days, with temperatures rising into the 20's under light to moderate alpine winds.  Hope is on the horizon, as the trough is expected to dig deep enough to deliver some snowfall by the end of the week.  It won't be a blockbuster storm, but we'll take whatever we can get. Southeast Mountains Last Night (5PM - 5AM) Today (5AM - 5PM) Tonight (5PM - 5AM) Temperature 16 to 20 F 29 F 4 F Cloud Cover Clear Clear Clear Ridgeline Wind Speed Light Light Light Wind Direction W NW NW Snowfall 12hr: 0 \" 24hr: 0 \" 0 \" 0 \" Snow Water Equivalent 12hr: 0 \" 24hr: 0 \" 0 \" 0 \" This information is provided by the Crested Butte Avalanche Center and describes general backcountry avalanche hazard and conditions. It does not apply to ski areas and highways where avalanche mitigation is conducted. SNOWPOCALYPSE Observations Donate / Join Report Website Issues CBAC \u00a9 Copyright 2020| WEB SITE DESIGN BY MMS",
+      "temp_low": 16,
+      "temp_high": 20
+    },
+    "raw_html": ""
+  },
+  {
+    "zone": "southeast",
+    "zone_name": "Southeast Mountains",
+    "issue_date": "2026-01-19",
+    "valid_date": "2026-01-18",
+    "danger_alpine": 2,
+    "danger_treeline": 2,
+    "danger_below_treeline": 1,
+    "bottom_line": "Most slopes are adjusting to the ongoing dry spell, but not all terrain has fully stabilized. Expect stubborn wind slabs on recently drifted slopes, and give yourself a cautious margin on the shady side of the compass near and above treeline where a low-probability persistent slab could still break deeper and wider.  The safest and highest quality riding is in wind-protected terrain at lower elevations.",
+    "discussion": "There are two flavors of slab problems to manage in the backcountry right now. The first is relatively small and easy to recognize on the snow surface.  Last week's northerly winds formed thin, hard slabs over the fragile snow surface that is our current January dryspell weak layer.  As this problem was developing last week, skiers and riders triggered five D1 to D1.5 wind slab avalanches on east and northeast aspects near and below treeline, with a few natural avalanches on high-elevation southerly aspects. The broad distribution reflects northerly winds mixing into lower elevations and blowing across the terrain that was holding onto dry, soft snow available for transport.  Now that these drifts have stiffened, they've become stubborn to trigger but are expected to persist because they formed over facets. This problem is also self-policing, as the best riding conditions are found on wind-protected or wind-eroded slopes where slabs are absent.",
+    "problems": [
+      {
+        "problem_number": 1,
+        "problem_type": "persistent_slab",
+        "likelihood": "Possible",
+        "size": "D2",
+        "aspect_elevation_rose": {
+          "N": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "NE": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "E": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SE": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "S": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SW": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "W": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "NW": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          }
+        },
+        "details": "A large persistent slab on a wind-loaded slope near Crystal Peak that likely ran around January 10th during a previous wind event."
+      },
+      {
+        "problem_number": 2,
+        "problem_type": "wind_slab",
+        "likelihood": "Possible",
+        "size": "D2",
+        "aspect_elevation_rose": {
+          "N": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "NE": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "E": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SE": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "S": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SW": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "W": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "NW": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          }
+        },
+        "details": "In this skier-triggered wind slab from last week, you can see where the slab formed on the lee or cross-loaded side of the subtle ridge line. To the lookers' right and left of the slab, you can see wind erosion with some raised tracks. There are two flavors of slab problems to manage in the backcountry right now. The second problem is less common but carries more serious consequences and should remain at the forefront of your decision-making.   Slabs breaking several feet thick on December and November weak layers have become increasingly isolated and are now considered unlikely as our dry spell continues. It has been 11 days since we had measurable snowfall, and more and more slopes are finding equilibrium without ongoing loading.  Persistent slab activity over the past week has been limited to a few explosive results, one very large natural just outside our forecast boundary, and a smaller step-down avalanche that began as a skier-triggered wind slab.  Last week's wind events eroded "
+      }
+    ],
+    "forecast_url": "https://cbavalanchecenter.org/forecasts/#/southeast-mountains",
+    "weather": {
+      "summary": "Colorado remains stuck in northwest flow between a stagnant high-pressure ridge over California and a stagnant trough over the Great Lakes.  Dry and mild weather continues for the next few days, with temperatures rising into the 20's under light to moderate alpine winds.  Hope is on the horizon, as the trough is expected to dig deep enough to deliver some snowfall by the end of the week.  It won't be a blockbuster storm, but we'll take whatever we can get. Southeast Mountains Last Night (5PM - 5",
+      "full_text": "Colorado remains stuck in northwest flow between a stagnant high-pressure ridge over California and a stagnant trough over the Great Lakes.  Dry and mild weather continues for the next few days, with temperatures rising into the 20's under light to moderate alpine winds.  Hope is on the horizon, as the trough is expected to dig deep enough to deliver some snowfall by the end of the week.  It won't be a blockbuster storm, but we'll take whatever we can get. Southeast Mountains Last Night (5PM - 5AM) Today (5AM - 5PM) Tonight (5PM - 5AM) Temperature 16 to 20 F 29 F 4 F Cloud Cover Clear Clear Clear Ridgeline Wind Speed Light Light Light Wind Direction W NW NW Snowfall 12hr: 0 \" 24hr: 0 \" 0 \" 0 \" Snow Water Equivalent 12hr: 0 \" 24hr: 0 \" 0 \" 0 \" This information is provided by the Crested Butte Avalanche Center and describes general backcountry avalanche hazard and conditions. It does not apply to ski areas and highways where avalanche mitigation is conducted. SNOWPOCALYPSE Observations Donate / Join Report Website Issues CBAC \u00a9 Copyright 2020| WEB SITE DESIGN BY MMS",
+      "temp_low": 16,
+      "temp_high": 20
+    },
+    "raw_html": ""
+  },
+  {
+    "zone": "southeast",
+    "zone_name": "Southeast Mountains",
+    "issue_date": "2026-01-19",
+    "valid_date": "2026-01-17",
+    "danger_alpine": 2,
+    "danger_treeline": 2,
+    "danger_below_treeline": 1,
+    "bottom_line": "Most slopes are adjusting to the ongoing dry spell, but not all terrain has fully stabilized. Expect stubborn wind slabs on recently drifted slopes, and give yourself a cautious margin on the shady side of the compass near and above treeline where a low-probability persistent slab could still break deeper and wider.  The safest and highest quality riding is in wind-protected terrain at lower elevations.",
+    "discussion": "There are two flavors of slab problems to manage in the backcountry right now. The first is relatively small and easy to recognize on the snow surface.  Last week's northerly winds formed thin, hard slabs over the fragile snow surface that is our current January dryspell weak layer.  As this problem was developing last week, skiers and riders triggered five D1 to D1.5 wind slab avalanches on east and northeast aspects near and below treeline, with a few natural avalanches on high-elevation southerly aspects. The broad distribution reflects northerly winds mixing into lower elevations and blowing across the terrain that was holding onto dry, soft snow available for transport.  Now that these drifts have stiffened, they've become stubborn to trigger but are expected to persist because they formed over facets. This problem is also self-policing, as the best riding conditions are found on wind-protected or wind-eroded slopes where slabs are absent.",
+    "problems": [
+      {
+        "problem_number": 1,
+        "problem_type": "persistent_slab",
+        "likelihood": "Possible",
+        "size": "D2",
+        "aspect_elevation_rose": {
+          "N": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "NE": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "E": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SE": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "S": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SW": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "W": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "NW": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          }
+        },
+        "details": "A large persistent slab on a wind-loaded slope near Crystal Peak that likely ran around January 10th during a previous wind event."
+      },
+      {
+        "problem_number": 2,
+        "problem_type": "wind_slab",
+        "likelihood": "Possible",
+        "size": "D2",
+        "aspect_elevation_rose": {
+          "N": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "NE": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "E": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SE": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "S": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SW": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "W": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "NW": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          }
+        },
+        "details": "In this skier-triggered wind slab from last week, you can see where the slab formed on the lee or cross-loaded side of the subtle ridge line. To the lookers' right and left of the slab, you can see wind erosion with some raised tracks. There are two flavors of slab problems to manage in the backcountry right now. The second problem is less common but carries more serious consequences and should remain at the forefront of your decision-making.   Slabs breaking several feet thick on December and November weak layers have become increasingly isolated and are now considered unlikely as our dry spell continues. It has been 11 days since we had measurable snowfall, and more and more slopes are finding equilibrium without ongoing loading.  Persistent slab activity over the past week has been limited to a few explosive results, one very large natural just outside our forecast boundary, and a smaller step-down avalanche that began as a skier-triggered wind slab.  Last week's wind events eroded "
+      }
+    ],
+    "forecast_url": "https://cbavalanchecenter.org/forecasts/#/southeast-mountains",
+    "weather": {
+      "summary": "Colorado remains stuck in northwest flow between a stagnant high-pressure ridge over California and a stagnant trough over the Great Lakes.  Dry and mild weather continues for the next few days, with temperatures rising into the 20's under light to moderate alpine winds.  Hope is on the horizon, as the trough is expected to dig deep enough to deliver some snowfall by the end of the week.  It won't be a blockbuster storm, but we'll take whatever we can get. Southeast Mountains Last Night (5PM - 5",
+      "full_text": "Colorado remains stuck in northwest flow between a stagnant high-pressure ridge over California and a stagnant trough over the Great Lakes.  Dry and mild weather continues for the next few days, with temperatures rising into the 20's under light to moderate alpine winds.  Hope is on the horizon, as the trough is expected to dig deep enough to deliver some snowfall by the end of the week.  It won't be a blockbuster storm, but we'll take whatever we can get. Southeast Mountains Last Night (5PM - 5AM) Today (5AM - 5PM) Tonight (5PM - 5AM) Temperature 16 to 20 F 29 F 4 F Cloud Cover Clear Clear Clear Ridgeline Wind Speed Light Light Light Wind Direction W NW NW Snowfall 12hr: 0 \" 24hr: 0 \" 0 \" 0 \" Snow Water Equivalent 12hr: 0 \" 24hr: 0 \" 0 \" 0 \" This information is provided by the Crested Butte Avalanche Center and describes general backcountry avalanche hazard and conditions. It does not apply to ski areas and highways where avalanche mitigation is conducted. SNOWPOCALYPSE Observations Donate / Join Report Website Issues CBAC \u00a9 Copyright 2020| WEB SITE DESIGN BY MMS",
+      "temp_low": 16,
+      "temp_high": 20
+    },
+    "raw_html": ""
+  }
+]

@@ -1,0 +1,374 @@
+[
+  {
+    "zone": "southeast",
+    "zone_name": "Southeast Mountains",
+    "forecast_id": 178317,
+    "issue_date": "2026-01-19",
+    "valid_date": "2026-01-19",
+    "danger_alpine": 2,
+    "danger_treeline": 2,
+    "danger_below_treeline": 1,
+    "bottom_line": "Most slopes are adjusting to the ongoing dry spell, but not all terrain has fully stabilized. Expect stubborn wind slabs on recently drifted slopes, and give yourself a cautious margin on the shady side of the compass near and above treeline where a low-probability persistent slab could still break deeper and wider.&nbsp; The safest and highest quality riding is in wind-protected terrain at lower elevations.&nbsp;&nbsp;",
+    "discussion": "There are two flavors of slab problems to manage in the backcountry right now.\nThe first is relatively small and easy to recognize on the snow surface.&nbsp; Last week's northerly winds formed thin, hard slabs over the fragile snow surface that is our current January dryspell weak layer. &nbsp;As this problem was developing last week, skiers and riders triggered five D1 to D1.5 wind slab avalanches on east and northeast aspects near and below treeline, with a few natural avalanches on high-elevation southerly aspects. The broad distribution reflects northerly winds mixing into lower elevations and blowing across the terrain that was holding onto dry, soft snow available for transport.&nbsp; Now that these drifts have stiffened, they've become stubborn to trigger but are expected to persist because they formed over facets. This problem is also self-policing, as the best riding conditions are found on wind-protected or wind-eroded slopes where slabs are absent.\nThe second problem is less common but carries more serious consequences and should remain at the forefront of your decision-making. &nbsp; Slabs breaking several feet thick on December and November weak layers have become increasingly isolated and are now considered unlikely as our dry spell continues. It has been 11 days since we had measurable snowfall, and more and more slopes are finding equilibrium without ongoing loading.&nbsp; Persistent slab activity over the past week has been limited to a few explosive results, one very large natural just outside our forecast boundary, and a smaller step-down avalanche that began as a skier-triggered wind slab.&nbsp; Last week's wind events eroded weight from many suspect slopes and concentrated it onto features that collect drifting. &nbsp;As a result, the slopes most likely to still be near a breaking point are those that have been recently stressed by wind loading.&nbsp;&nbsp;\nUpcoming Outreach Events: &nbsp;\nFireside Chat:&nbsp; Jan 23, Dave Scheefer \"Historical avalanches in Gunnison County.\"&nbsp; Mallardi Theatre 5-7 pm.\nTrailhead Day: Jan 24, Slate River, 10 am-2 pm.",
+    "problems": [
+      {
+        "problem_number": 1,
+        "problem_type": "persistent_slab",
+        "likelihood": "Unlikely",
+        "size": "D1-2",
+        "aspect_elevation_rose": {
+          "N": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": false
+          },
+          "NE": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": false
+          },
+          "E": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": false
+          },
+          "SE": {
+            "alpine": true,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "S": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SW": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "W": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": false
+          },
+          "NW": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": false
+          }
+        },
+        "details": "<p>A large persistent slab on a wind-loaded slope near Crystal Peak that likely ran around January 10th during a previous wind event.&nbsp;</p>"
+      },
+      {
+        "problem_number": 2,
+        "problem_type": "wind_slab",
+        "likelihood": "Possible",
+        "size": "D1-1.5",
+        "aspect_elevation_rose": {
+          "N": {
+            "alpine": false,
+            "treeline": true,
+            "below_treeline": true
+          },
+          "NE": {
+            "alpine": false,
+            "treeline": true,
+            "below_treeline": true
+          },
+          "E": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": true
+          },
+          "SE": {
+            "alpine": true,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "S": {
+            "alpine": true,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SW": {
+            "alpine": true,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "W": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": true
+          },
+          "NW": {
+            "alpine": false,
+            "treeline": true,
+            "below_treeline": true
+          }
+        },
+        "details": "<p>In this skier-triggered wind slab from last week, you can see where the slab formed on the lee or cross-loaded side of the subtle ridge line. To the lookers' right and left of the slab, you can see wind erosion with some raised tracks.</p>"
+      }
+    ],
+    "forecast_url": "https://cbavalanchecenter.org/forecasts/#/forecast/southeast_mountains/178317",
+    "weather": null
+  },
+  {
+    "zone": "southeast",
+    "zone_name": "Southeast Mountains",
+    "forecast_id": 178295,
+    "issue_date": "2026-01-19",
+    "valid_date": "2026-01-19",
+    "danger_alpine": 0,
+    "danger_treeline": 0,
+    "danger_below_treeline": 0,
+    "bottom_line": "",
+    "discussion": "",
+    "problems": [],
+    "forecast_url": "https://cbavalanchecenter.org/forecasts/#/forecast/southeast_mountains/178295",
+    "weather": null
+  },
+  {
+    "zone": "southeast",
+    "zone_name": "Southeast Mountains",
+    "forecast_id": 178266,
+    "issue_date": "2026-01-18",
+    "valid_date": "2026-01-18",
+    "danger_alpine": 2,
+    "danger_treeline": 2,
+    "danger_below_treeline": 1,
+    "bottom_line": "There are two types of slab avalanches you can encounter today. Both primarily exist on the northern half of the compass. The more likely problem to encounter is small, hard slabs that formed at all elevations on the lee sides of terrain features. These old wind slabs are responsible for multiple skier-triggered avalanches over the last several days. The more significant, but less likely to trigger avalanche problem would be a slab avalanche releasing 1.5 to 3 feet deep on old, persistent weak layers. You can reduce your exposure to these avalanche problems by riding in wind-sheltered terrain, where you will also find the best snow quality for skiing and riding.&nbsp;",
+    "discussion": "The most notable change in backcountry conditions has been the continuation of northerly winds, which peaked with extreme wind speeds on Friday night into Saturday. Those winds have changed the snowpack across the forecast area, with widespread wind erosion and the formation of thin, hard slabs. The Gunnison River Basin is at 58% of the 30-year median peak, and we haven't seen a notable winter storm in over a week. So there wasn't much snow available for transport, but those winds were strong enough to erode wind-exposed terrain and transport what little soft snow was available. One positive way to look at this wind event is that snow surfaces are often uninviting in the more susceptible areas for triggering a slab avalanche. Backcountry riders will now often be pushed to wind-sheltered areas where it will be less likely to trigger a slab avalanche.&nbsp;\nThe below treeline avalanche danger rating dropped to LOW, as confidence increased last week that the persistent slab avalanche problem was either stubborn and isolated or non-existent at those lower elevations. The recent wind event and formation of thin, hard slabs threw a little wrench in the danger trend. Those hard slabs are small, and it will be unlikely for them to cause much harm by themselves, unless they were to push you into a more hazardous terrain feature. The potential size and consequences of the problem can fit at the lower end of the danger scale, but you will still likely find yourself avoiding those hard slabs while searching for better snow quality.&nbsp;\nUpcoming Outreach Events: &nbsp;\nFireside Chat:&nbsp; Jan 23 Dave Scheefer \"Historical avalanches in Gunnison County.\"&nbsp; Mallardi Theatre 5-7 pm.\nTrailhead Day: Jan 24, Slate River, 10 am-2 pm",
+    "problems": [
+      {
+        "problem_number": 1,
+        "problem_type": "persistent_slab",
+        "likelihood": "Possible",
+        "size": "D1-2",
+        "aspect_elevation_rose": {
+          "N": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": false
+          },
+          "NE": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": false
+          },
+          "E": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": false
+          },
+          "SE": {
+            "alpine": true,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "S": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SW": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "W": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": false
+          },
+          "NW": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": false
+          }
+        },
+        "details": "<p>A large persistent slab on a wind-loaded slope near Crystal Peak that likely ran around January 10th during a previous wind event.&nbsp;</p>"
+      },
+      {
+        "problem_number": 2,
+        "problem_type": "wind_slab",
+        "likelihood": "Possible",
+        "size": "D1-1.5",
+        "aspect_elevation_rose": {
+          "N": {
+            "alpine": false,
+            "treeline": true,
+            "below_treeline": true
+          },
+          "NE": {
+            "alpine": false,
+            "treeline": true,
+            "below_treeline": true
+          },
+          "E": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": true
+          },
+          "SE": {
+            "alpine": true,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "S": {
+            "alpine": true,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SW": {
+            "alpine": true,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "W": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": true
+          },
+          "NW": {
+            "alpine": false,
+            "treeline": true,
+            "below_treeline": true
+          }
+        },
+        "details": "<p>In this avalanche example, you can see where the slab formed on the lee or cross-loaded side of the subtle ridge line. To the lookers' right and left of the slab, you can see wind erosion with some raised tracks.</p>"
+      }
+    ],
+    "forecast_url": "https://cbavalanchecenter.org/forecasts/#/forecast/southeast_mountains/178266",
+    "weather": null
+  },
+  {
+    "zone": "southeast",
+    "zone_name": "Southeast Mountains",
+    "forecast_id": 178241,
+    "issue_date": "2026-01-18",
+    "valid_date": "2026-01-18",
+    "danger_alpine": 0,
+    "danger_treeline": 0,
+    "danger_below_treeline": 0,
+    "bottom_line": "",
+    "discussion": "",
+    "problems": [],
+    "forecast_url": "https://cbavalanchecenter.org/forecasts/#/forecast/southeast_mountains/178241",
+    "weather": null
+  },
+  {
+    "zone": "southeast",
+    "zone_name": "Southeast Mountains",
+    "forecast_id": 178188,
+    "issue_date": "2026-01-17",
+    "valid_date": "2026-01-17",
+    "danger_alpine": 2,
+    "danger_treeline": 2,
+    "danger_below_treeline": 2,
+    "bottom_line": "An ongoing northerly wind event is responsible for multiple human-triggered wind slabs at all elevations. These small slabs have typically formed on cross-loaded terrain features on the northern half of the compass. In one case, a triggered wind slab stepped down to the deeper and more concerning persistent slab avalanche problem. The best snow quality can currently be found in wind-sheltered areas, where you can avoid those hard slabs created by the wind. You can also reduce your exposure to the larger persistent slab avalanche problem by choosing lower slope angles or terrain below about 10,500ft in elevation.&nbsp;",
+    "discussion": "Last night's trace of new snow was a big win. Otherwise, we have to look back a full week to the last time we saw measurable snow accumulation. Northerly winds have been fairly persistent through the week, and somehow they keep finding snow to blow. There have been 5 human-triggered wind slabs since 1/14. These have all been small in size, given the lower amounts of snow available for transport. These winds have even transported some snow at valley elevations, and we've seen a couple of small wind slabs occur at these lower elevations. The below treeline avalanche danger has briefly bumped back up to MODERATE in the SE Mountain forecast area to account for the formation of these small slabs on cross-loaded terrain features at those lower elevations.&nbsp;\nThe recent wind slabs are grabbing some highlights, but the more significant avalanche problem remains the larger persistent slab avalanche problem. This observation from Coon Basin noted a wind slab that stepped down into a deeper persistent slab. The whole avalanche didn't notably become large in size, but that is a real potential of a smaller wind slab, stepping down into a deeper persistent slab and becoming larger than expected. This natural avalanche off&nbsp;Ant Peak (just west of the CBAC forecast boundary near Marble) commands some attention.&nbsp; Although the exact details are unclear, this slope may have failed due to wind loading on Wednesday.&nbsp;\nThe snowpack is well below average, with the Gunnison River basin currently sitting at 61% of the 30-year median. The persistent slab avalanche problem has quieted down since the last winter storm a week ago. This shallow snowpack is still weak, and small changes in the weather are leading to brief upticks in avalanche activity, such as the very large avalanche on Ant Peak and the current round of small human-triggered wind slabs.&nbsp;\n&nbsp;\nUpcoming Outreach Events: &nbsp;\nFireside Chat:&nbsp; Jan 23 Dave Scheefer \"Historical avalanches in Gunnison County.\"&nbsp; Mallardi Theatre 5-7 pm.\nTrailhead Days: Jan 23 Slate River 10 am-2 pm",
+    "problems": [
+      {
+        "problem_number": 1,
+        "problem_type": "persistent_slab",
+        "likelihood": "Possible",
+        "size": "D1.5-2.5",
+        "aspect_elevation_rose": {
+          "N": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": false
+          },
+          "NE": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": false
+          },
+          "E": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": false
+          },
+          "SE": {
+            "alpine": true,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "S": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SW": {
+            "alpine": false,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "W": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": false
+          },
+          "NW": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": false
+          }
+        },
+        "details": "<p>A large persistent slab on a wind-loaded slope near Crystal Peak that likely ran last weekend.&nbsp;</p>\n<p>&nbsp;</p>"
+      },
+      {
+        "problem_number": 2,
+        "problem_type": "wind_slab",
+        "likelihood": "Possible",
+        "size": "D1-1.5",
+        "aspect_elevation_rose": {
+          "N": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": true
+          },
+          "NE": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": true
+          },
+          "E": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": true
+          },
+          "SE": {
+            "alpine": true,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "S": {
+            "alpine": true,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "SW": {
+            "alpine": true,
+            "treeline": false,
+            "below_treeline": false
+          },
+          "W": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": false
+          },
+          "NW": {
+            "alpine": true,
+            "treeline": true,
+            "below_treeline": true
+          }
+        },
+        "details": "<p>A recent human-triggered wind slab on a cross-loaded terrain feature. Purple Ridge, 1/14/2026.</p>"
+      }
+    ],
+    "forecast_url": "https://cbavalanchecenter.org/forecasts/#/forecast/southeast_mountains/178188",
+    "weather": null
+  }
+]
