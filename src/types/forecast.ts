@@ -82,6 +82,25 @@ export interface ForecastWeather {
   snowfall_24hr?: string;
 }
 
+// Trend types for forecast analysis
+export type ForecastTrend = 'improving' | 'steady' | 'worsening' | 'storm_incoming' | 'new_problem';
+
+export const TREND_LABELS: Record<ForecastTrend, string> = {
+  improving: 'Improving',
+  steady: 'Steady',
+  worsening: 'Worsening',
+  storm_incoming: 'Storm Incoming',
+  new_problem: 'New Problem',
+};
+
+export const TREND_COLORS: Record<ForecastTrend, string> = {
+  improving: '#22c55e', // green
+  steady: '#3b82f6', // blue
+  worsening: '#f97316', // orange
+  storm_incoming: '#ef4444', // red
+  new_problem: '#eab308', // yellow
+};
+
 // Main forecast (1 per day per zone)
 export interface Forecast {
   id: string;
@@ -91,10 +110,17 @@ export interface Forecast {
   danger_alpine: DangerLevel;
   danger_treeline: DangerLevel;
   danger_below_treeline: DangerLevel;
+  travel_advice?: string;
   bottom_line: string;
   discussion?: string;
   problems: AvalancheProblem[];
   weather?: ForecastWeather;
+  // Analysis fields
+  trend?: ForecastTrend;
+  key_message?: string;
+  confidence?: 'low' | 'moderate' | 'high';
+  recent_activity_summary?: string;
+  recent_avalanche_count?: number;
   created_at?: string;
 }
 

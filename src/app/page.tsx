@@ -6,9 +6,10 @@ import { DangerPyramid } from '@/components/DangerPyramid';
 import { ProblemCard } from '@/components/ProblemCard';
 import { ForecastRow } from '@/components/ForecastRow';
 import { WeekAnalysis } from '@/components/WeekAnalysis';
+import { QuickTake } from '@/components/QuickTake';
 import { getForecastsWithWeather, isSupabaseConfigured, DBForecast, DBAvalancheProblem, DBWeatherForecast } from '@/lib/supabase';
 import { mockForecasts, getMockForecast } from '@/lib/mockData';
-import { DANGER_LABELS, Forecast, AvalancheProblem } from '@/types/forecast';
+import { DANGER_LABELS, Forecast, AvalancheProblem, ForecastTrend, TREND_LABELS, TREND_COLORS } from '@/types/forecast';
 import Link from 'next/link';
 
 // Convert DB format to frontend format
@@ -24,6 +25,7 @@ function convertForecast(
     danger_alpine: dbForecast.danger_alpine as 1 | 2 | 3 | 4 | 5,
     danger_treeline: dbForecast.danger_treeline as 1 | 2 | 3 | 4 | 5,
     danger_below_treeline: dbForecast.danger_below_treeline as 1 | 2 | 3 | 4 | 5,
+    travel_advice: dbForecast.travel_advice || undefined,
     bottom_line: dbForecast.bottom_line || '',
     discussion: dbForecast.discussion || '',
     problems: dbForecast.avalanche_problems.map((p): AvalancheProblem => ({
@@ -50,6 +52,11 @@ function convertForecast(
       snowfall_12hr: weather.metrics.snowfall_12hr,
       snowfall_24hr: weather.metrics.snowfall_24hr,
     } : undefined,
+    trend: dbForecast.trend as ForecastTrend | undefined,
+    key_message: dbForecast.key_message || undefined,
+    confidence: dbForecast.confidence as 'low' | 'moderate' | 'high' | undefined,
+    recent_activity_summary: dbForecast.recent_activity_summary || undefined,
+    recent_avalanche_count: dbForecast.recent_avalanche_count || undefined,
   };
 }
 
@@ -142,6 +149,9 @@ function DashboardContent() {
           Northwest
         </button>
       </div>
+
+      {/* Quick Take - Primary actionable summary */}
+      <QuickTake forecast={currentForecast} />
 
       {/* Current Forecast Header */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

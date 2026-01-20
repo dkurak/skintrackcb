@@ -40,10 +40,17 @@ export interface DBForecast {
   danger_alpine: number
   danger_treeline: number
   danger_below_treeline: number
+  travel_advice: string | null
   bottom_line: string | null
   discussion: string | null
   forecast_url: string | null
   raw_data: any
+  // Analysis fields
+  trend: string | null
+  key_message: string | null
+  confidence: string | null
+  recent_activity_summary: string | null
+  recent_avalanche_count: number | null
   created_at: string
   updated_at: string
 }
