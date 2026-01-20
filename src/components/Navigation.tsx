@@ -47,7 +47,19 @@ export function Navigation() {
             ))}
 
             {/* User menu */}
-            <div className="ml-2 pl-2 border-l border-gray-700">
+            <div className="ml-2 pl-2 border-l border-gray-700 flex items-center gap-1">
+              {profile?.is_admin && (
+                <Link
+                  href="/admin"
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    pathname.startsWith('/admin')
+                      ? 'bg-amber-600 text-white'
+                      : 'text-amber-400 hover:bg-gray-800 hover:text-amber-300'
+                  }`}
+                >
+                  Admin
+                </Link>
+              )}
               {user ? (
                 <Link
                   href="/profile"
@@ -106,6 +118,19 @@ export function Navigation() {
 
             {/* User link in mobile menu */}
             <div className="pt-2 mt-2 border-t border-gray-700">
+              {profile?.is_admin && (
+                <Link
+                  href="/admin"
+                  onClick={() => setIsOpen(false)}
+                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                    pathname.startsWith('/admin')
+                      ? 'bg-amber-600 text-white'
+                      : 'text-amber-400 hover:bg-gray-800 hover:text-amber-300'
+                  }`}
+                >
+                  Admin
+                </Link>
+              )}
               {user ? (
                 <Link
                   href="/profile"
