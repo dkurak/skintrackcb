@@ -95,9 +95,9 @@ def analyze_trend_from_text(bottom_line: str, discussion: str) -> str:
 
 
 def calculate_trend(
-    current_danger: int,
+    current_danger_sum: int,
     current_problems: int,
-    prev_danger: Optional[int],
+    prev_danger_sum: Optional[int],
     prev_problems: Optional[int],
     bottom_line: str,
     discussion: str
@@ -105,7 +105,10 @@ def calculate_trend(
     """
     Calculate trend by comparing danger levels between days.
 
-    Primary signal: danger level change
+    Uses SUM of all three bands (not just MAX) to catch individual band changes.
+    e.g., BTL going from 2→1 while others stay same = improving
+
+    Primary signal: danger sum change
     Secondary signal: problem count change
     Tertiary signal: text analysis
 
@@ -113,7 +116,7 @@ def calculate_trend(
         trend string: 'improving', 'steady', 'worsening', 'storm_incoming'
     """
     # If no previous data, use text analysis
-    if prev_danger is None:
+    if prev_danger_sum is None:
         return analyze_trend_from_text(bottom_line, discussion)
 
     # Check for storm incoming in text first (takes priority)
@@ -121,24 +124,24 @@ def calculate_trend(
     if text_trend == "storm_incoming":
         return "storm_incoming"
 
-    # Compare danger levels (primary signal)
-    danger_change = current_danger - prev_danger
+    # Compare danger sums (primary signal)
+    danger_change = current_danger_sum - prev_danger_sum
 
     if danger_change < 0:
-        # Danger decreased = improving
+        # Danger sum decreased = improving (any band got better)
         return "improving"
     elif danger_change > 0:
-        # Danger increased = worsening
+        # Danger sum increased = worsening (any band got worse)
         return "worsening"
 
-    # Danger same - check problem count (secondary signal)
+    # Danger sum same - check problem count (secondary signal)
     if prev_problems is not None:
         problem_change = current_problems - prev_problems
         if problem_change < 0:
             # Fewer problems = improving
             return "improving"
         elif problem_change > 0:
-            # More problems = worsening (or new_problem)
+            # More problems = worsening
             return "worsening"
 
     # Danger and problems same - use text analysis (tertiary signal)
@@ -204,7 +207,7 @@ def get_previous_forecast(client: Client, zone: str, valid_date: str) -> Optiona
     Fetch the previous day's forecast for comparison.
 
     Returns:
-        Dict with danger_level and problem_count, or None if not found
+        Dict with danger_sum and problem_count, or None if not found
     """
     from datetime import datetime, timedelta
 
@@ -215,37 +218,29 @@ def get_previous_forecast(client: Client, zone: str, valid_date: str) -> Optiona
 
         # Fetch previous forecast
         result = client.table("forecasts").select(
-            "danger_alpine, danger_treeline, danger_below_treeline"
+            "id, danger_alpine, danger_treeline, danger_below_treeline"
         ).eq("zone_id", zone).eq("valid_date", prev_date).execute()
 
         if result.data and len(result.data) > 0:
             prev = result.data[0]
-            prev_danger = max(
-                prev["danger_alpine"],
-                prev["danger_treeline"],
+            # Use SUM of all bands for more granular comparison
+            prev_danger_sum = (
+                prev["danger_alpine"] +
+                prev["danger_treeline"] +
                 prev["danger_below_treeline"]
             )
 
             # Get problem count
-            prob_result = client.table("avalanche_problems").select(
-                "id", count="exact"
-            ).eq("forecast_id", result.data[0].get("id", "")).execute()
-
-            # Try to get problem count from a join instead
-            prob_result = client.table("forecasts").select(
-                "id"
-            ).eq("zone_id", zone).eq("valid_date", prev_date).execute()
-
             prev_problems = 0
-            if prob_result.data and len(prob_result.data) > 0:
-                forecast_id = prob_result.data[0]["id"]
+            forecast_id = prev.get("id")
+            if forecast_id:
                 prob_count = client.table("avalanche_problems").select(
                     "id"
                 ).eq("forecast_id", forecast_id).execute()
                 prev_problems = len(prob_count.data) if prob_count.data else 0
 
             return {
-                "danger_level": prev_danger,
+                "danger_sum": prev_danger_sum,
                 "problem_count": prev_problems
             }
 
@@ -281,12 +276,20 @@ def save_forecast(client: Client, forecast: Forecast) -> Optional[str]:
         # Get previous day's forecast for trend comparison
         prev_forecast = get_previous_forecast(client, forecast.zone, forecast.valid_date)
 
+        # Calculate danger sum (for trend comparison) - uses SUM not MAX
+        # to catch individual band changes
+        danger_sum = (
+            forecast.danger_alpine +
+            forecast.danger_treeline +
+            forecast.danger_below_treeline
+        )
+
         # Calculate trend by comparing to previous day
         current_problems = len(forecast.problems) if forecast.problems else 0
         trend = calculate_trend(
-            current_danger=danger_level,
+            current_danger_sum=danger_sum,
             current_problems=current_problems,
-            prev_danger=prev_forecast["danger_level"] if prev_forecast else None,
+            prev_danger_sum=prev_forecast["danger_sum"] if prev_forecast else None,
             prev_problems=prev_forecast["problem_count"] if prev_forecast else None,
             bottom_line=forecast.bottom_line or "",
             discussion=forecast.discussion or ""
@@ -335,9 +338,9 @@ def save_forecast(client: Client, forecast: Forecast) -> Optional[str]:
             forecast_id = result.data[0]["id"]
             print(f"  Saved forecast for {forecast.zone_name} ({forecast.valid_date})")
             if prev_forecast:
-                print(f"    Danger: {prev_forecast['danger_level']} → {danger_level} | Trend: {trend}")
+                print(f"    Danger sum: {prev_forecast['danger_sum']} → {danger_sum} | Max: {danger_level} | Trend: {trend}")
             else:
-                print(f"    Danger: {danger_level} | Trend: {trend} (no previous day)")
+                print(f"    Danger: {danger_level} (sum: {danger_sum}) | Trend: {trend} (no previous day)")
 
             # Delete existing problems for this forecast (to handle updates)
             client.table("avalanche_problems").delete().eq(
