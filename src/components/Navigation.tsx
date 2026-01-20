@@ -9,7 +9,7 @@ const navItems = [
   { href: '/', label: 'Forecast' },
   { href: '/history', label: 'History' },
   { href: '/weather', label: 'Weather' },
-  { href: '/partners', label: 'Tours' },
+  { href: '/trips', label: 'Trips' },
 ];
 
 export function Navigation() {
@@ -63,12 +63,23 @@ export function Navigation() {
               {user ? (
                 <Link
                   href="/profile"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     pathname === '/profile'
                       ? 'bg-gray-700 text-white'
                       : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                   }`}
                 >
+                  {profile?.avatar_url ? (
+                    <img
+                      src={profile.avatar_url}
+                      alt=""
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs font-bold">
+                      {(profile?.display_name || user.email || '?')[0].toUpperCase()}
+                    </span>
+                  )}
                   {profile?.display_name || 'Profile'}
                 </Link>
               ) : (
@@ -135,12 +146,23 @@ export function Navigation() {
                 <Link
                   href="/profile"
                   onClick={() => setIsOpen(false)}
-                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium transition-colors ${
                     pathname === '/profile'
                       ? 'bg-gray-700 text-white'
                       : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                   }`}
                 >
+                  {profile?.avatar_url ? (
+                    <img
+                      src={profile.avatar_url}
+                      alt=""
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs font-bold">
+                      {(profile?.display_name || user.email || '?')[0].toUpperCase()}
+                    </span>
+                  )}
                   {profile?.display_name || 'Profile'}
                 </Link>
               ) : (

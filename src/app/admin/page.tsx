@@ -301,7 +301,7 @@ export default function AdminPage() {
       {activityStats.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Activity Stats ({totalTrips} total trips)
+            Activity Stats ({totalTrips} total)
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {activityStats.map((stat) => (
@@ -378,12 +378,12 @@ export default function AdminPage() {
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
         <h3 className="font-semibold text-blue-900 mb-2">Test the experience</h3>
         <div className="flex flex-wrap gap-2">
-          <a href="/partners" className="text-blue-600 hover:text-blue-800 text-sm">
-            Browse Tours →
+          <a href="/trips" className="text-blue-600 hover:text-blue-800 text-sm">
+            Browse Trips →
           </a>
           <span className="text-blue-300">|</span>
-          <a href="/partners/new" className="text-blue-600 hover:text-blue-800 text-sm">
-            Post a Tour →
+          <a href="/trips/new" className="text-blue-600 hover:text-blue-800 text-sm">
+            Post a Trip →
           </a>
           <span className="text-blue-300">|</span>
           <a href="/profile" className="text-blue-600 hover:text-blue-800 text-sm">

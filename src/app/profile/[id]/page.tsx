@@ -160,8 +160,8 @@ export default function PublicProfilePage() {
       <div className="text-center py-12">
         <h1 className="text-xl font-semibold text-gray-900 mb-2">Profile not found</h1>
         <p className="text-gray-500 mb-4">This user may not exist.</p>
-        <Link href="/partners" className="text-blue-600 hover:text-blue-800">
-          Browse tours
+        <Link href="/trips" className="text-blue-600 hover:text-blue-800">
+          Browse trips
         </Link>
       </div>
     );
@@ -173,10 +173,10 @@ export default function PublicProfilePage() {
     <div className="space-y-6">
       {/* Back link */}
       <Link
-        href="/partners"
+        href="/trips"
         className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
       >
-        ← Back to tours
+        ← Back to trips
       </Link>
 
       {/* Profile header */}
@@ -286,17 +286,17 @@ export default function PublicProfilePage() {
         </div>
       </div>
 
-      {/* Tours Organized */}
+      {/* Trips Organized */}
       {organizedTours.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Tours Organized ({organizedTours.length})
+            Trips Organized ({organizedTours.length})
           </h2>
           <div className="space-y-2">
             {organizedTours.map((tour) => (
               <Link
                 key={tour.id}
-                href={`/partners/${tour.id}`}
+                href={`/trips/${tour.id}`}
                 className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <div className="flex items-center justify-between">
@@ -330,17 +330,17 @@ export default function PublicProfilePage() {
         </div>
       )}
 
-      {/* Tours Joined */}
+      {/* Trips Joined */}
       {joinedTours.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Tours Joined ({joinedTours.length})
+            Trips Joined ({joinedTours.length})
           </h2>
           <div className="space-y-2">
             {joinedTours.map((tour) => (
               <Link
                 key={tour.id}
-                href={`/partners/${tour.id}`}
+                href={`/trips/${tour.id}`}
                 className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <div className="font-medium text-gray-900">{tour.title}</div>
@@ -359,10 +359,10 @@ export default function PublicProfilePage() {
         </div>
       )}
 
-      {/* No tour history */}
+      {/* No trip history */}
       {organizedTours.length === 0 && joinedTours.length === 0 && (
         <div className="bg-gray-50 rounded-xl p-6 text-center">
-          <p className="text-gray-500">No tour history yet.</p>
+          <p className="text-gray-500">No trip history yet.</p>
         </div>
       )}
     </div>

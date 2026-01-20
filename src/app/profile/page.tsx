@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { getTrailheads, Trailhead } from '@/lib/trailheads';
+import { AvatarUpload } from '@/components/AvatarUpload';
 
 const EXPERIENCE_LEVELS = [
   { value: 'beginner', label: 'Beginner', description: 'New to backcountry, learning basics' },
@@ -53,6 +54,7 @@ export default function ProfilePage() {
   const { user, profile, loading, updateProfile, signOut } = useAuth();
 
   const [displayName, setDisplayName] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [birthDate, setBirthDate] = useState('');
   const [experienceLevel, setExperienceLevel] = useState('');
   const [yearsExperience, setYearsExperience] = useState('');
@@ -81,6 +83,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (profile) {
       setDisplayName(profile.display_name || '');
+      setAvatarUrl(profile.avatar_url || null);
       setBirthDate(profile.birth_date || '');
       setExperienceLevel(profile.experience_level || '');
       setYearsExperience(profile.years_experience?.toString() || '');
@@ -130,6 +133,7 @@ export default function ProfilePage() {
 
     const { error } = await updateProfile({
       display_name: displayName || null,
+      avatar_url: avatarUrl,
       birth_date: birthDate || null,
       experience_level: experienceLevel as 'beginner' | 'intermediate' | 'advanced' | 'expert' | null || null,
       years_experience: yearsExperience ? parseInt(yearsExperience) : null,
@@ -211,6 +215,20 @@ export default function ProfilePage() {
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Info</h2>
           <div className="space-y-4">
+            {/* Avatar Upload */}
+            {user && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Profile Photo
+                </label>
+                <AvatarUpload
+                  userId={user.id}
+                  currentAvatarUrl={avatarUrl}
+                  onUploadComplete={(url) => setAvatarUrl(url)}
+                />
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Display Name
@@ -544,13 +562,13 @@ export default function ProfilePage() {
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
         <div className="flex items-center justify-between">
           <div>
-            <div className="font-semibold text-blue-900">Find Touring Partners</div>
+            <div className="font-semibold text-blue-900">Find Partners</div>
             <div className="text-sm text-blue-700">
-              Browse tour posts and connect with other backcountry skiers
+              Browse trips and connect with other outdoor enthusiasts
             </div>
           </div>
           <Link
-            href="/partners"
+            href="/trips"
             className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
           >
             Browse

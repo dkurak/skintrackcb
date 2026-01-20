@@ -65,7 +65,7 @@ export default function NewTourPostPage() {
     setError(null);
 
     if (!user) {
-      setError('You must be logged in to post a tour');
+      setError('You must be logged in to post a trip');
       return;
     }
 
@@ -119,7 +119,7 @@ export default function NewTourPostPage() {
       setError(createError.message);
       setIsSubmitting(false);
     } else if (data) {
-      router.push(`/partners/${data.id}`);
+      router.push(`/trips/${data.id}`);
     }
   };
 
@@ -139,9 +139,9 @@ export default function NewTourPostPage() {
     <div className="max-w-2xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Post a Tour</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Post a Trip</h1>
         <Link
-          href="/partners"
+          href="/trips"
           className="text-sm text-gray-600 hover:text-gray-900"
         >
           Cancel
@@ -179,7 +179,7 @@ export default function NewTourPostPage() {
           </div>
         </div>
 
-        {/* Tour details card */}
+        {/* Trip details card */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-900">
             {ACTIVITY_LABELS[activity]} Details
@@ -447,7 +447,7 @@ export default function NewTourPostPage() {
           disabled={isSubmitting}
           className="w-full bg-gray-900 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {isSubmitting ? 'Posting...' : 'Post Tour'}
+          {isSubmitting ? 'Posting...' : 'Post Trip'}
         </button>
       </form>
     </div>

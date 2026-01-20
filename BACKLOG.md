@@ -41,6 +41,25 @@ _Features prioritized for upcoming work_
 
 ## Ideas / Unprioritized
 
+### App Structure Redesign
+
+- [ ] **Personal Dashboard / Home Page**
+  - Trip-focused home page for logged-in users
+  - Shows: your upcoming trips, trips you've organized, recent activity
+  - Weather widget (universal across all activities)
+  - Quick links to post a new trip or browse trips
+
+- [ ] **Seasonal Navigation for Avalanche**
+  - Avalanche/Forecast tab visible only during winter season (when CBAC is reporting)
+  - In summer, link still works for browsing historical data
+  - "Coming soon for [season]" message off-season
+
+- [ ] **Activity-Based Navigation**
+  - Consider activity tabs/filters as primary navigation
+  - Universal content: Weather, Trips
+  - Seasonal content: Avalanche forecast (winter)
+  - Personal content: Dashboard, Profile
+
 ### Admin & Data Management
 
 - [ ] **Custom Trailhead Admin Screen**
@@ -56,6 +75,13 @@ _Features prioritized for upcoming work_
   - Referenced in admin/trailheads as "Coming soon"
 
 ### User Features
+
+- [ ] **Profile Picture Upload**
+  - Use Supabase Storage (free tier: 1GB)
+  - Upload component on profile edit page
+  - Display in nav bar next to name
+  - Show on trip cards and profile pages
+  - Image resize/compression before upload
 
 - [ ] **Invite Users to Tour**
   - Tour organizers can invite specific people to their tour

@@ -22,7 +22,7 @@ function TourPostCard({ post }: { post: TourPost }) {
 
   return (
     <Link
-      href={`/partners/${post.id}`}
+      href={`/trips/${post.id}`}
       className="block bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:border-gray-300 hover:shadow-md transition-all"
     >
       <div className="flex items-start justify-between gap-4">
@@ -134,17 +134,17 @@ export default function PartnersPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Tours</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Trips</h1>
           <p className="text-gray-500">
-            {posts.length} {posts.length === 1 ? 'tour' : 'tours'} posted
+            {posts.length} {posts.length === 1 ? 'trip' : 'trips'} posted
           </p>
         </div>
         {user ? (
           <Link
-            href="/partners/new"
+            href="/trips/new"
             className="inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
           >
-            + Post a Tour
+            + Post a Trip
           </Link>
         ) : (
           <Link
@@ -169,7 +169,7 @@ export default function PartnersPage() {
                   : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
               }`}
             >
-              My Tours
+              My Trips
             </button>
             <span className="text-gray-300">|</span>
           </>
@@ -225,35 +225,35 @@ export default function PartnersPage() {
         </div>
       </div>
 
-      {/* Tour posts list */}
+      {/* Trip posts list */}
       {loading ? (
         <div className="text-center py-12">
-          <p className="text-gray-500">Loading tours...</p>
+          <p className="text-gray-500">Loading trips...</p>
         </div>
       ) : posts.length === 0 ? (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
           <div className="text-4xl mb-4">{showMyTours ? '📋' : '🎿'}</div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             {showMyTours
-              ? 'No tours yet'
+              ? 'No trips yet'
               : timeFrame === 'past'
-              ? 'No past tours'
-              : 'No upcoming tours'}
+              ? 'No past trips'
+              : 'No upcoming trips'}
           </h3>
           <p className="text-gray-500 mb-4">
             {showMyTours
-              ? "You haven't organized or joined any tours yet."
+              ? "You haven't organized or joined any trips yet."
               : timeFrame === 'past'
-              ? 'Check upcoming tours to find partners!'
-              : 'Be the first to post a tour and find partners!'}
+              ? 'Check upcoming trips to find partners!'
+              : 'Be the first to post a trip and find partners!'}
           </p>
           {!showMyTours && (
             user ? (
               <Link
-                href="/partners/new"
+                href="/trips/new"
                 className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
               >
-                Post a Tour
+                Post a Trip
               </Link>
             ) : (
               <Link
@@ -278,7 +278,7 @@ export default function PartnersPage() {
         <h3 className="font-semibold text-blue-900 mb-2">How it works</h3>
         <ul className="text-sm text-blue-800 space-y-1">
           <li>1. Create a profile with your experience and gear</li>
-          <li>2. Post a tour with date, zone, and requirements</li>
+          <li>2. Post a trip with date, zone, and requirements</li>
           <li>3. Others can express interest in joining</li>
           <li>4. Review requests and coordinate directly</li>
         </ul>

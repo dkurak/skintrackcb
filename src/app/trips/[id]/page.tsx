@@ -146,7 +146,7 @@ export default function TourPostPage() {
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this tour post?')) {
+    if (!confirm('Are you sure you want to delete this trip?')) {
       return;
     }
 
@@ -155,7 +155,7 @@ export default function TourPostPage() {
     if (deleteError) {
       setError(deleteError.message);
     } else {
-      router.push('/partners');
+      router.push('/trips');
     }
   };
 
@@ -215,13 +215,13 @@ export default function TourPostPage() {
   if (!post) {
     return (
       <div className="text-center py-12">
-        <h1 className="text-xl font-semibold text-gray-900 mb-2">Tour not found</h1>
-        <p className="text-gray-500 mb-4">This tour may have been deleted or doesn&apos;t exist.</p>
+        <h1 className="text-xl font-semibold text-gray-900 mb-2">Trip not found</h1>
+        <p className="text-gray-500 mb-4">This trip may have been deleted or doesn&apos;t exist.</p>
         <Link
-          href="/partners"
+          href="/trips"
           className="text-blue-600 hover:text-blue-800"
         >
-          Browse other tours
+          Browse other trips
         </Link>
       </div>
     );
@@ -234,10 +234,10 @@ export default function TourPostPage() {
     <div className="space-y-6">
       {/* Back link */}
       <Link
-        href="/partners"
+        href="/trips"
         className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
       >
-        ← Back to tours
+        ← Back to trips
       </Link>
 
       {/* Main card */}
@@ -396,7 +396,7 @@ export default function TourPostPage() {
                 onClick={() => handleStatusChange('confirmed')}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
               >
-                Confirm Tour - It&apos;s On!
+                Confirm Trip - It&apos;s On!
               </button>
             )}
             {(post.status === 'open' || post.status === 'confirmed') && (
@@ -411,7 +411,7 @@ export default function TourPostPage() {
               onClick={handleDelete}
               className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg text-sm font-medium transition-colors"
             >
-              Delete Tour
+              Delete Trip
             </button>
           </div>
         )}
@@ -425,7 +425,7 @@ export default function TourPostPage() {
             <h2 className="text-lg font-semibold text-green-800">You&apos;re In!</h2>
           </div>
           <p className="text-green-700">
-            You&apos;ve been accepted to this tour. Check back for updates from the organizer.
+            You&apos;ve been accepted to this trip. Check back for updates from the organizer.
           </p>
         </div>
       )}
@@ -483,7 +483,7 @@ export default function TourPostPage() {
             </div>
           ) : (
             <div>
-              <p className="text-gray-600 mb-4">Sign in to express interest in this tour.</p>
+              <p className="text-gray-600 mb-4">Sign in to express interest in this trip.</p>
               <Link
                 href="/login"
                 className="inline-block bg-blue-600 text-white py-2 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
