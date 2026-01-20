@@ -155,27 +155,11 @@ export default function AdminTrailheadsPage() {
     }
   };
 
-  if (!user) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">Please sign in to access admin area.</p>
-        <Link href="/login" className="text-blue-600 hover:underline mt-2 inline-block">
-          Sign in
-        </Link>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Admin: Trailheads</h1>
-          <p className="text-gray-500">Manage trailhead locations</p>
-        </div>
-        <Link href="/admin" className="text-sm text-blue-600 hover:text-blue-800">
-          ← Back to Admin
-        </Link>
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Trailheads</h1>
+        <p className="text-gray-500">Manage trailhead locations</p>
       </div>
 
       {/* Messages */}

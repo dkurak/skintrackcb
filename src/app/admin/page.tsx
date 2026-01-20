@@ -124,9 +124,9 @@ export default function AdminPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Admin: Test Users</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Test Users</h1>
         <p className="text-gray-500">
-          Create and manage test users for development
+          Create and manage fake test users for development and demos
         </p>
       </div>
 
@@ -238,24 +238,6 @@ export default function AdminPage() {
             ))}
           </div>
         )}
-      </div>
-
-      {/* Admin Sections */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Admin Sections</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <a
-            href="/admin/trailheads"
-            className="p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
-          >
-            <div className="font-medium text-gray-900">Trailheads</div>
-            <div className="text-sm text-gray-500">Manage trailhead locations</div>
-          </a>
-          <div className="p-4 border border-gray-200 rounded-lg opacity-50">
-            <div className="font-medium text-gray-900">Routes/Lines</div>
-            <div className="text-sm text-gray-500">Coming soon...</div>
-          </div>
-        </div>
       </div>
 
       {/* Quick Links */}

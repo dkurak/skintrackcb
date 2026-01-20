@@ -30,6 +30,7 @@ interface Profile {
   show_phone: boolean;
   show_on_tours: boolean;
   is_test_user: boolean;
+  is_admin: boolean;
   created_at: string;
   updated_at: string;
 }
