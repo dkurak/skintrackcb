@@ -84,8 +84,8 @@ function generateQuickTake(forecast: Forecast): string[] {
 
 function getTrendIcon(trend: ForecastTrend | undefined): string {
   switch (trend) {
-    case 'improving': return '↓';
-    case 'worsening': return '↑';
+    case 'improving': return '↑';  // Things looking up
+    case 'worsening': return '↓';  // Things going down
     case 'storm_incoming': return '⚠';
     case 'new_problem': return '!';
     default: return '→';

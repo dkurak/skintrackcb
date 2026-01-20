@@ -1,11 +1,22 @@
 'use client';
 
-import { Forecast, DANGER_LABELS, ForecastWeather } from '@/types/forecast';
+import { Forecast, DANGER_LABELS, ForecastWeather, ForecastTrend, TREND_LABELS, TREND_COLORS } from '@/types/forecast';
 import { DangerPyramid } from './DangerPyramid';
 import { AspectRose } from './AspectRose';
 import { PROBLEM_LABELS } from '@/types/forecast';
 import { analyzeWeek } from './WeekAnalysis';
 import { SkyIcon, WindIcon } from './WeatherIcons';
+
+// Trend icon helper
+function getTrendIcon(trend: ForecastTrend | undefined): string {
+  switch (trend) {
+    case 'improving': return '↑';
+    case 'worsening': return '↓';
+    case 'storm_incoming': return '⚠';
+    case 'new_problem': return '!';
+    default: return '→';
+  }
+}
 
 // Weather display with fixed-width columns for alignment
 function WeatherBadge({ weather }: { weather?: ForecastWeather }) {
@@ -138,6 +149,19 @@ export function ForecastRow({ forecast, previousForecast, weekForecasts, expande
           <div className="text-xs text-gray-500 capitalize">{forecast.zone}</div>
         </div>
 
+        {/* Trend badge */}
+        {forecast.trend && (
+          <div
+            className="flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap"
+            style={{
+              backgroundColor: TREND_COLORS[forecast.trend] + '20',
+              color: TREND_COLORS[forecast.trend],
+            }}
+          >
+            {getTrendIcon(forecast.trend)} {TREND_LABELS[forecast.trend]}
+          </div>
+        )}
+
         {/* Danger Pyramid */}
         <div className="flex-shrink-0">
           <DangerPyramid
@@ -258,6 +282,19 @@ export function ForecastRow({ forecast, previousForecast, weekForecasts, expande
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Quick Take / Key Message */}
+          {(forecast.key_message || forecast.travel_advice) && (
+            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <h4 className="text-sm font-semibold text-amber-900 mb-1">Quick Take</h4>
+              {forecast.key_message && (
+                <p className="text-sm text-amber-800">{forecast.key_message}</p>
+              )}
+              {forecast.travel_advice && forecast.travel_advice !== forecast.key_message && (
+                <p className="text-sm text-amber-700 mt-1">{forecast.travel_advice}</p>
+              )}
             </div>
           )}
 
