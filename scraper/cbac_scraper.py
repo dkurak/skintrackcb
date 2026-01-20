@@ -459,12 +459,174 @@ def save_to_json(forecasts: list, filename: str = "forecasts.json"):
     print(f"Saved {len(forecasts)} forecasts to {filename}")
 
 
+@dataclass
+class DailyObservationSummary:
+    """Summary of observations for a single day."""
+    date: str
+    total_observations: int
+    avalanche_count: int
+    red_flags_count: int  # cracking, whumpfing, shooting cracks
+    locations: list
+
+
+@dataclass
+class ObservationTrend:
+    """Trend analysis from observation data."""
+    period_days: int
+    daily_counts: list  # List of (date, count) tuples
+    trend: str  # 'increasing', 'decreasing', 'stable'
+    total_avalanches: int
+    notable_locations: list
+
+
+def calculate_trend(daily_counts: list) -> str:
+    """Calculate trend from a list of daily observation counts."""
+    if len(daily_counts) < 3:
+        return "insufficient_data"
+
+    counts = [c[1] for c in daily_counts]
+
+    # Calculate simple moving trend
+    first_half = sum(counts[:len(counts)//2])
+    second_half = sum(counts[len(counts)//2:])
+
+    if second_half > first_half * 1.5:
+        return "increasing"
+    elif first_half > second_half * 1.5:
+        return "decreasing"
+    else:
+        return "stable"
+
+
+async def scrape_observations(days: int = 7) -> Optional[ObservationTrend]:
+    """
+    Scrape observation data from CBAC for trend analysis.
+
+    Args:
+        days: Number of days to look back
+
+    Returns:
+        ObservationTrend with daily counts and trend analysis
+    """
+    from datetime import timedelta
+
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=days)
+
+    # Format dates for URL
+    start_str = start_date.strftime("%Y-%m-%d")
+    end_str = end_date.strftime("%Y-%m-%d")
+    season = end_date.strftime("%Y")
+
+    url = f"{CBAC_BASE_URL}/view-observations/#/view/avalanches?startDate={start_str}&endDate={end_str}&season={season}"
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
+
+        # Capture API responses
+        api_data = []
+
+        async def handle_response(response):
+            if 'api' in response.url or 'observation' in response.url.lower():
+                try:
+                    data = await response.json()
+                    api_data.append(data)
+                except:
+                    pass
+
+        page.on('response', handle_response)
+
+        try:
+            print(f"Fetching observations from {url}")
+            await page.goto(url, wait_until="networkidle", timeout=30000)
+            await page.wait_for_timeout(5000)  # Wait for SPA to load data
+
+            # Try to extract data from the page
+            daily_counts = []
+            total_avalanches = 0
+            locations = set()
+
+            # Try to find observation cards or list items
+            observation_selectors = [
+                '[class*="observation"]',
+                '[class*="card"]',
+                '.list-item',
+                'tr',
+            ]
+
+            for selector in observation_selectors:
+                obs_els = await page.query_selector_all(selector)
+                if obs_els and len(obs_els) > 1:
+                    # Parse observation elements
+                    for el in obs_els:
+                        try:
+                            text = await el.inner_text()
+                            text_lower = text.lower()
+
+                            # Check if it's an avalanche observation
+                            if 'avalanche' in text_lower:
+                                total_avalanches += 1
+
+                            # Try to extract location
+                            location_patterns = [
+                                r'(gothic|irwin|kebler|cement|carbon|brush|pearl|paradise|washington)',
+                            ]
+                            for pattern in location_patterns:
+                                match = re.search(pattern, text_lower)
+                                if match:
+                                    locations.add(match.group(0).title())
+                        except:
+                            continue
+                    break
+
+            # If we captured API data, parse it
+            if api_data:
+                for data in api_data:
+                    if isinstance(data, list):
+                        # Assume list of observations
+                        for obs in data:
+                            if isinstance(obs, dict):
+                                # Extract date and count
+                                obs_date = obs.get('date') or obs.get('observation_date')
+                                if obs_date:
+                                    # Normalize date
+                                    if isinstance(obs_date, str):
+                                        obs_date = obs_date[:10]  # YYYY-MM-DD
+                                    daily_counts.append((obs_date, 1))
+
+            # Aggregate by day
+            date_counts = {}
+            for date, count in daily_counts:
+                date_counts[date] = date_counts.get(date, 0) + count
+
+            aggregated_counts = sorted(date_counts.items())
+
+            trend = calculate_trend(aggregated_counts) if aggregated_counts else "insufficient_data"
+
+            return ObservationTrend(
+                period_days=days,
+                daily_counts=aggregated_counts,
+                trend=trend,
+                total_avalanches=total_avalanches,
+                notable_locations=list(locations)
+            )
+
+        except Exception as e:
+            print(f"Error scraping observations: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
+        finally:
+            await browser.close()
+
+
 async def main():
     """Main entry point for the scraper."""
     print("Starting CBAC forecast scraper...")
     print("=" * 50)
 
-    # Test with one zone first
+    # Test forecast scraping
     forecast = await scrape_forecast("southeast")
 
     if forecast:
@@ -481,6 +643,21 @@ async def main():
         save_to_json([forecast], "test_forecast.json")
     else:
         print("Failed to extract forecast")
+
+    # Test observation scraping
+    print("\n" + "-" * 50)
+    print("Fetching observations for trend analysis...")
+
+    obs_trend = await scrape_observations(days=7)
+
+    if obs_trend:
+        print(f"\nObservation Trend (last {obs_trend.period_days} days):")
+        print(f"  Trend: {obs_trend.trend}")
+        print(f"  Total avalanches: {obs_trend.total_avalanches}")
+        print(f"  Notable locations: {', '.join(obs_trend.notable_locations) or 'None identified'}")
+        print(f"  Daily counts: {obs_trend.daily_counts}")
+    else:
+        print("Failed to extract observations")
 
     print("\n" + "=" * 50)
 
