@@ -101,23 +101,16 @@ UPDATE forecasts
 SET travel_advice = substring(bottom_line FROM '(You can reduce[^.]+\.)')
 WHERE travel_advice IS NULL AND lower(bottom_line) LIKE '%you can reduce%';
 
--- Clean up
-DROP FUNCTION IF EXISTS calc_max_danger(int, int, int);
-
 -- Show results
 SELECT
   valid_date,
   zone_id,
-  calc_max_danger(danger_alpine, danger_treeline, danger_below_treeline) as danger,
+  GREATEST(danger_alpine, danger_treeline, danger_below_treeline) as danger,
   trend,
   LEFT(key_message, 50) as key_message_preview
 FROM forecasts
 ORDER BY valid_date DESC, zone_id
 LIMIT 20;
 
--- Recreate the function for future use (we dropped it above)
-CREATE OR REPLACE FUNCTION calc_max_danger(alp int, tl int, btl int) RETURNS int AS $$
-BEGIN
-  RETURN GREATEST(alp, tl, btl);
-END;
-$$ LANGUAGE plpgsql;
+-- Clean up the helper function
+DROP FUNCTION IF EXISTS calc_max_danger(int, int, int);
