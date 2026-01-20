@@ -138,7 +138,7 @@ CREATE OR REPLACE FUNCTION generate_sample_activity_data()
 RETURNS TEXT AS $$
 DECLARE
   user_ids UUID[];
-  user_id UUID;
+  organizer_id UUID;
   trip_id UUID;
   responder_id UUID;
   current_date DATE := CURRENT_DATE;
@@ -189,7 +189,7 @@ BEGIN
     -- Generate 5-15 trips per month (simulating active community)
     FOR j IN 1..floor(random() * 10 + 5)::integer LOOP
       -- Pick random user as organizer
-      user_id := user_ids[floor(random() * array_length(user_ids, 1) + 1)];
+      organizer_id := user_ids[floor(random() * array_length(user_ids, 1) + 1)];
 
       -- Pick activity based on season
       IF month IN (12, 1, 2, 3) THEN
@@ -223,7 +223,7 @@ BEGIN
         activity_details,
         created_at
       ) VALUES (
-        user_id,
+        organizer_id,
         -- Generate contextual titles
         CASE activity
           WHEN 'ski_tour' THEN (ARRAY[
@@ -348,7 +348,7 @@ BEGIN
       FROM (
         SELECT u
         FROM unnest(user_ids) as u
-        WHERE u != user_id
+        WHERE u != organizer_id
         ORDER BY random()
         LIMIT num_responses
       ) sub;
@@ -383,8 +383,8 @@ BEGIN
       -- Add messages for confirmed/completed trips (50% chance)
       IF random() > 0.5 THEN
         INSERT INTO tour_messages (tour_id, user_id, content, created_at) VALUES
-        (trip_id, user_id, 'Looking forward to this! Let me know if plans change.', trip_date - interval '3 days'),
-        (trip_id, user_id, 'Weather looks good. See everyone at the trailhead!', trip_date - interval '1 day');
+        (trip_id, organizer_id, 'Looking forward to this! Let me know if plans change.', trip_date - interval '3 days'),
+        (trip_id, organizer_id, 'Weather looks good. See everyone at the trailhead!', trip_date - interval '1 day');
         message_count := message_count + 2;
 
         IF random_users IS NOT NULL AND array_length(random_users, 1) > 0 THEN
