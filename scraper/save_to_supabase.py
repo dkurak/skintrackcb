@@ -56,18 +56,16 @@ DANGER_TEXT = {
 }
 
 
-def analyze_trend(bottom_line: str, discussion: str) -> Tuple[str, Optional[str], Optional[str]]:
+def analyze_trend_from_text(bottom_line: str, discussion: str) -> str:
     """
-    Analyze forecast text to determine trend, key message, and travel advice.
+    Analyze forecast text to determine trend based on keywords.
+    Used as fallback when danger levels are unchanged.
 
     Returns:
-        Tuple of (trend, key_message, travel_advice)
+        trend string
     """
     text = f"{bottom_line or ''} {discussion or ''}"
     text_lower = text.lower()
-
-    # Determine trend based on keywords
-    trend = "steady"  # default
 
     # Storm incoming indicators
     storm_patterns = [
@@ -77,24 +75,79 @@ def analyze_trend(bottom_line: str, discussion: str) -> Tuple[str, Optional[str]
         "loading will", "new load"
     ]
     if any(pattern in text_lower for pattern in storm_patterns):
-        trend = "storm_incoming"
+        return "storm_incoming"
 
-    # Worsening indicators (if not already storm)
-    elif any(kw in text_lower for kw in [
+    # Worsening indicators
+    if any(kw in text_lower for kw in [
         "dangerous avalanche conditions", "heightened avalanche conditions",
         "increasing", "elevated danger"
     ]):
-        trend = "worsening"
+        return "worsening"
 
     # Improving indicators
-    elif any(kw in text_lower for kw in [
+    if any(kw in text_lower for kw in [
         "adjusting", "stabiliz", "decreased", "isolated",
         "stubborn", "unlikely", "slowly improved", "conditions have improved"
     ]):
-        trend = "improving"
+        return "improving"
 
-    # Extract key message - look for actionable sentences
-    key_message = None
+    return "steady"
+
+
+def calculate_trend(
+    current_danger: int,
+    current_problems: int,
+    prev_danger: Optional[int],
+    prev_problems: Optional[int],
+    bottom_line: str,
+    discussion: str
+) -> str:
+    """
+    Calculate trend by comparing danger levels between days.
+
+    Primary signal: danger level change
+    Secondary signal: problem count change
+    Tertiary signal: text analysis
+
+    Returns:
+        trend string: 'improving', 'steady', 'worsening', 'storm_incoming'
+    """
+    # If no previous data, use text analysis
+    if prev_danger is None:
+        return analyze_trend_from_text(bottom_line, discussion)
+
+    # Check for storm incoming in text first (takes priority)
+    text_trend = analyze_trend_from_text(bottom_line, discussion)
+    if text_trend == "storm_incoming":
+        return "storm_incoming"
+
+    # Compare danger levels (primary signal)
+    danger_change = current_danger - prev_danger
+
+    if danger_change < 0:
+        # Danger decreased = improving
+        return "improving"
+    elif danger_change > 0:
+        # Danger increased = worsening
+        return "worsening"
+
+    # Danger same - check problem count (secondary signal)
+    if prev_problems is not None:
+        problem_change = current_problems - prev_problems
+        if problem_change < 0:
+            # Fewer problems = improving
+            return "improving"
+        elif problem_change > 0:
+            # More problems = worsening (or new_problem)
+            return "worsening"
+
+    # Danger and problems same - use text analysis (tertiary signal)
+    return text_trend
+
+
+def extract_key_message(bottom_line: str, discussion: str) -> Optional[str]:
+    """Extract the most actionable sentence from forecast text."""
+    text = f"{bottom_line or ''} {discussion or ''}"
     sentences = re.split(r'[.!]', text)
 
     key_patterns = [
@@ -114,21 +167,21 @@ def analyze_trend(bottom_line: str, discussion: str) -> Tuple[str, Optional[str]
             continue
         for pattern in key_patterns:
             if re.search(pattern, sentence.lower()):
-                key_message = sentence[:300]  # Limit length
-                break
-        if key_message:
-            break
+                return sentence[:300]
 
-    # If no key message found, use first meaningful sentence
-    if not key_message:
-        for sentence in sentences:
-            sentence = sentence.strip()
-            if len(sentence) > 30:
-                key_message = sentence[:300]
-                break
+    # If no key pattern found, use first meaningful sentence
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if len(sentence) > 30:
+            return sentence[:300]
 
-    # Extract travel advice
-    travel_advice = None
+    return None
+
+
+def extract_travel_advice(bottom_line: str, discussion: str) -> Optional[str]:
+    """Extract travel/terrain advice from forecast text."""
+    text = f"{bottom_line or ''} {discussion or ''}"
+
     travel_patterns = [
         r'(the safest[^.]+\.)',
         r'(you can reduce[^.]+\.)',
@@ -141,10 +194,66 @@ def analyze_trend(bottom_line: str, discussion: str) -> Tuple[str, Optional[str]
     for pattern in travel_patterns:
         match = re.search(pattern, text, re.IGNORECASE)
         if match:
-            travel_advice = match.group(1).strip()[:300]
-            break
+            return match.group(1).strip()[:300]
 
-    return trend, key_message, travel_advice
+    return None
+
+
+def get_previous_forecast(client: Client, zone: str, valid_date: str) -> Optional[Dict[str, Any]]:
+    """
+    Fetch the previous day's forecast for comparison.
+
+    Returns:
+        Dict with danger_level and problem_count, or None if not found
+    """
+    from datetime import datetime, timedelta
+
+    try:
+        # Parse the date and get previous day
+        current_date = datetime.strptime(valid_date, "%Y-%m-%d")
+        prev_date = (current_date - timedelta(days=1)).strftime("%Y-%m-%d")
+
+        # Fetch previous forecast
+        result = client.table("forecasts").select(
+            "danger_alpine, danger_treeline, danger_below_treeline"
+        ).eq("zone_id", zone).eq("valid_date", prev_date).execute()
+
+        if result.data and len(result.data) > 0:
+            prev = result.data[0]
+            prev_danger = max(
+                prev["danger_alpine"],
+                prev["danger_treeline"],
+                prev["danger_below_treeline"]
+            )
+
+            # Get problem count
+            prob_result = client.table("avalanche_problems").select(
+                "id", count="exact"
+            ).eq("forecast_id", result.data[0].get("id", "")).execute()
+
+            # Try to get problem count from a join instead
+            prob_result = client.table("forecasts").select(
+                "id"
+            ).eq("zone_id", zone).eq("valid_date", prev_date).execute()
+
+            prev_problems = 0
+            if prob_result.data and len(prob_result.data) > 0:
+                forecast_id = prob_result.data[0]["id"]
+                prob_count = client.table("avalanche_problems").select(
+                    "id"
+                ).eq("forecast_id", forecast_id).execute()
+                prev_problems = len(prob_count.data) if prob_count.data else 0
+
+            return {
+                "danger_level": prev_danger,
+                "problem_count": prev_problems
+            }
+
+        return None
+
+    except Exception as e:
+        print(f"    Warning: Could not fetch previous forecast: {e}")
+        return None
 
 
 def get_supabase_client() -> Client:
@@ -169,8 +278,26 @@ def save_forecast(client: Client, forecast: Forecast) -> Optional[str]:
             forecast.danger_below_treeline
         )
 
-        # Analyze trend and extract key message
-        trend, key_message, travel_advice = analyze_trend(
+        # Get previous day's forecast for trend comparison
+        prev_forecast = get_previous_forecast(client, forecast.zone, forecast.valid_date)
+
+        # Calculate trend by comparing to previous day
+        current_problems = len(forecast.problems) if forecast.problems else 0
+        trend = calculate_trend(
+            current_danger=danger_level,
+            current_problems=current_problems,
+            prev_danger=prev_forecast["danger_level"] if prev_forecast else None,
+            prev_problems=prev_forecast["problem_count"] if prev_forecast else None,
+            bottom_line=forecast.bottom_line or "",
+            discussion=forecast.discussion or ""
+        )
+
+        # Extract key message and travel advice
+        key_message = extract_key_message(
+            forecast.bottom_line or "",
+            forecast.discussion or ""
+        )
+        travel_advice = extract_travel_advice(
             forecast.bottom_line or "",
             forecast.discussion or ""
         )
@@ -207,7 +334,10 @@ def save_forecast(client: Client, forecast: Forecast) -> Optional[str]:
         if result.data and len(result.data) > 0:
             forecast_id = result.data[0]["id"]
             print(f"  Saved forecast for {forecast.zone_name} ({forecast.valid_date})")
-            print(f"    Trend: {trend}")
+            if prev_forecast:
+                print(f"    Danger: {prev_forecast['danger_level']} → {danger_level} | Trend: {trend}")
+            else:
+                print(f"    Danger: {danger_level} | Trend: {trend} (no previous day)")
 
             # Delete existing problems for this forecast (to handle updates)
             client.table("avalanche_problems").delete().eq(
