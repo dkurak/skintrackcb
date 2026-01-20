@@ -14,6 +14,13 @@ interface TestUser {
   looking_for_partners: boolean;
 }
 
+interface ActivityStats {
+  activity: string;
+  total_trips: number;
+  completed_trips: number;
+  unique_organizers: number;
+}
+
 export default function AdminPage() {
   const router = useRouter();
   const { user, profile } = useAuth();
@@ -22,11 +29,63 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [activityStats, setActivityStats] = useState<ActivityStats[]>([]);
+  const [totalTrips, setTotalTrips] = useState(0);
 
-  // Fetch test users on load
+  // Fetch test users and stats on load
   useEffect(() => {
     fetchTestUsers();
+    fetchActivityStats();
   }, []);
+
+  const fetchActivityStats = async () => {
+    if (!supabase) return;
+
+    try {
+      // Get all test user trips activity stats
+      const { data: testUserIds } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('is_test_user', true);
+
+      if (!testUserIds || testUserIds.length === 0) {
+        setActivityStats([]);
+        setTotalTrips(0);
+        return;
+      }
+
+      const { data: stats } = await supabase
+        .from('tour_posts')
+        .select('activity, status')
+        .in('user_id', testUserIds.map(u => u.id));
+
+      if (stats) {
+        const grouped = stats.reduce((acc, trip) => {
+          const activity = trip.activity || 'ski_tour';
+          if (!acc[activity]) {
+            acc[activity] = { total: 0, completed: 0 };
+          }
+          acc[activity].total++;
+          if (trip.status === 'completed') {
+            acc[activity].completed++;
+          }
+          return acc;
+        }, {} as Record<string, { total: number; completed: number }>);
+
+        const statsArray = Object.entries(grouped).map(([activity, data]) => ({
+          activity,
+          total_trips: data.total,
+          completed_trips: data.completed,
+          unique_organizers: 0,
+        }));
+
+        setActivityStats(statsArray);
+        setTotalTrips(stats.length);
+      }
+    } catch (error) {
+      console.error('Error fetching activity stats:', error);
+    }
+  };
 
   const fetchTestUsers = async () => {
     setLoading(true);
@@ -54,8 +113,11 @@ export default function AdminPage() {
       });
       const data = await res.json();
       if (data.created) {
-        setMessage({ type: 'success', text: `Created ${data.created.filter((u: {status: string}) => u.status === 'created').length} test users with sample tours` });
+        const createdCount = data.created.filter((u: {status: string}) => u.status === 'created').length;
+        const historyMsg = data.history ? ` | ${data.history}` : '';
+        setMessage({ type: 'success', text: `Created ${createdCount} test users with sample tours${historyMsg}` });
         fetchTestUsers();
+        fetchActivityStats();
       } else if (data.error) {
         setMessage({ type: 'error', text: data.error });
       }
@@ -91,6 +153,28 @@ export default function AdminPage() {
     setActionLoading(false);
   };
 
+  const handleGenerateHistory = async () => {
+    setActionLoading(true);
+    setMessage(null);
+    try {
+      const res = await fetch('/api/admin/test-users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'generate_history' }),
+      });
+      const data = await res.json();
+      if (data.history) {
+        setMessage({ type: 'success', text: data.history });
+        fetchActivityStats();
+      } else if (data.error) {
+        setMessage({ type: 'error', text: data.error });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to generate historical data' });
+    }
+    setActionLoading(false);
+  };
+
   const handleSignInAs = async (email: string) => {
     if (!supabase) return;
 
@@ -121,12 +205,30 @@ export default function AdminPage() {
     expert: 'Expert',
   };
 
+  const ACTIVITY_LABELS: Record<string, string> = {
+    ski_tour: 'Ski Tour',
+    offroad: 'Offroad',
+    mountain_bike: 'Mountain Bike',
+    trail_run: 'Trail Run',
+    hike: 'Hike',
+    climb: 'Climb',
+  };
+
+  const ACTIVITY_COLORS: Record<string, string> = {
+    ski_tour: 'bg-blue-100 text-blue-700',
+    offroad: 'bg-orange-100 text-orange-700',
+    mountain_bike: 'bg-green-100 text-green-700',
+    trail_run: 'bg-purple-100 text-purple-700',
+    hike: 'bg-yellow-100 text-yellow-700',
+    climb: 'bg-red-100 text-red-700',
+  };
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Test Users</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Test Data Management</h1>
         <p className="text-gray-500">
-          Create and manage fake test users for development and demos
+          Create test users and generate 2+ years of multi-activity history for demos
         </p>
       </div>
 
@@ -166,6 +268,13 @@ export default function AdminPage() {
             {actionLoading ? 'Working...' : 'Create 15 Test Users + Sample Tours'}
           </button>
           <button
+            onClick={handleGenerateHistory}
+            disabled={actionLoading || testUsers.length === 0}
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 disabled:opacity-50 transition-colors"
+          >
+            {actionLoading ? 'Working...' : 'Regenerate 2+ Years History'}
+          </button>
+          <button
             onClick={handleDeleteTestUsers}
             disabled={actionLoading || testUsers.length === 0}
             className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 transition-colors"
@@ -173,7 +282,7 @@ export default function AdminPage() {
             Delete All Test Data
           </button>
           <button
-            onClick={fetchTestUsers}
+            onClick={() => { fetchTestUsers(); fetchActivityStats(); }}
             disabled={loading}
             className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 disabled:opacity-50 transition-colors"
           >
@@ -187,6 +296,31 @@ export default function AdminPage() {
           </p>
         )}
       </div>
+
+      {/* Activity Stats */}
+      {activityStats.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Activity Stats ({totalTrips} total trips)
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {activityStats.map((stat) => (
+              <div
+                key={stat.activity}
+                className={`p-3 rounded-lg ${ACTIVITY_COLORS[stat.activity] || 'bg-gray-100 text-gray-700'}`}
+              >
+                <div className="font-medium text-sm">
+                  {ACTIVITY_LABELS[stat.activity] || stat.activity}
+                </div>
+                <div className="text-2xl font-bold">{stat.total_trips}</div>
+                <div className="text-xs opacity-75">
+                  {stat.completed_trips} completed
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Test Users List */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

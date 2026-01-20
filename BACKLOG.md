@@ -10,7 +10,32 @@
 ## Planned
 _Features prioritized for upcoming work_
 
-(none yet)
+### Multi-Activity Platform Expansion
+
+- [ ] **Activity Type Support** (schema ready in migration 012)
+  - Support: ski touring, offroading, mountain biking, trail running, hiking, climbing
+  - Activity enum and details JSONB added to tour_posts
+  - Meeting points (trailheads) support multiple activity types
+  - User profiles track activity interests and per-activity experience
+  - Sample meeting points seeded for: CB area, Taylor Park, Moab
+
+- [ ] **UI Updates for Multi-Activity**
+  - Activity filter on tours browse page
+  - Activity selector on tour creation form
+  - Activity-specific icons and color coding
+  - Per-activity profile sections
+  - Seasonal activity suggestions
+
+- [ ] **Historical Data Demo**
+  - Function `generate_sample_activity_data()` creates 2+ years of seasonal trips
+  - Shows ski touring in winter, biking/hiking in summer
+  - Admin page button to regenerate demo data
+  - Demonstrates what app looks like with active community
+
+- [ ] **Rebranding for Multi-Activity**
+  - New name (domain candidates: rallyday.com, sendday.com, outcrew.com, trailpack.com)
+  - Activity-agnostic logo and branding
+  - "SkinTrack" → new name throughout
 
 ---
 
@@ -96,3 +121,7 @@ _Quick ideas, raw thoughts, things to research_
 - Consider OpenSnow or NOAA integration for weather data
 - Mobile app wrapper (PWA or React Native) for better mobile experience?
 - Notification system for tour responses, forecast changes
+- **Multi-activity architecture decision**: Single platform preferred over micro-sites
+  - Single login, cross-activity discovery, shared social graph
+  - If micro-sites wanted later, can default activity filter per subdomain
+  - Same core value: coordinating group outings with location/route sharing

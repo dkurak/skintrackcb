@@ -123,10 +123,37 @@ export async function POST(request: NextRequest) {
         createdUsers.push({ email, status: 'created', id: authUser.user.id });
       }
 
-      // Now create sample tours
+      // Create sample tours (old ski-only tours)
       await createSampleTours();
 
-      return NextResponse.json({ created: createdUsers });
+      // Generate rich multi-activity historical data (2+ years)
+      const { data: historyResult, error: historyError } = await supabaseAdmin
+        .rpc('generate_sample_activity_data');
+
+      const historyMessage = historyError
+        ? `Historical data error: ${historyError.message}`
+        : historyResult || 'Historical data generated';
+
+      return NextResponse.json({ created: createdUsers, history: historyMessage });
+    }
+
+    if (action === 'generate_history') {
+      // Just regenerate historical data without recreating users
+      // First, clear existing historical trips created by the function
+      await supabaseAdmin
+        .from('tour_posts')
+        .delete()
+        .in('user_id', (await supabaseAdmin.from('profiles').select('id').eq('is_test_user', true)).data?.map(u => u.id) || [])
+        .neq('activity', 'ski_tour'); // Keep original ski tours for now
+
+      const { data: historyResult, error: historyError } = await supabaseAdmin
+        .rpc('generate_sample_activity_data');
+
+      if (historyError) {
+        return NextResponse.json({ error: historyError.message }, { status: 500 });
+      }
+
+      return NextResponse.json({ history: historyResult });
     }
 
     if (action === 'delete') {
