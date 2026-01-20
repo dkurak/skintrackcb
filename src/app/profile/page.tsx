@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
+import { getTrailheads, Trailhead } from '@/lib/trailheads';
 
 const EXPERIENCE_LEVELS = [
   { value: 'beginner', label: 'Beginner', description: 'New to backcountry, learning basics' },
@@ -30,14 +31,7 @@ const CERTIFICATIONS = [
   'Other',
 ];
 
-const TRAILHEADS = [
-  { value: 'washington_gulch', label: 'Washington Gulch', description: "Coney's, etc." },
-  { value: 'snodgrass', label: 'Snodgrass', description: 'Snodgrass Mountain' },
-  { value: 'kebler', label: 'Kebler Pass', description: 'Red Lady (winter closure)' },
-  { value: 'brush_creek', label: 'Brush Creek', description: 'Brush Creek area' },
-  { value: 'cement_creek', label: 'Cement Creek', description: 'Cement Creek area' },
-  { value: 'slate_river', label: 'Slate River', description: 'Smith Hill (variable snow)' },
-];
+// Trailheads are now fetched from the database
 
 // Calculate age range from birth date
 function getAgeRange(birthDate: string | null): string | null {
@@ -76,6 +70,12 @@ export default function ProfilePage() {
   const [bio, setBio] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [trailheads, setTrailheads] = useState<Trailhead[]>([]);
+
+  // Fetch trailheads from database
+  useEffect(() => {
+    getTrailheads().then(setTrailheads);
+  }, []);
 
   // Populate form with existing profile data
   useEffect(() => {
@@ -307,19 +307,21 @@ export default function ProfilePage() {
                 Preferred Trailheads
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {TRAILHEADS.map((th) => (
+                {trailheads.map((th) => (
                   <button
-                    key={th.value}
+                    key={th.slug}
                     type="button"
-                    onClick={() => handleTrailheadToggle(th.value)}
+                    onClick={() => handleTrailheadToggle(th.slug)}
                     className={`p-3 rounded-lg border text-left transition-colors ${
-                      preferredTrailheads.includes(th.value)
+                      preferredTrailheads.includes(th.slug)
                         ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <div className="font-medium text-gray-900">{th.label}</div>
-                    <div className="text-xs text-gray-500">{th.description}</div>
+                    <div className="font-medium text-gray-900">{th.name}</div>
+                    {th.description && (
+                      <div className="text-xs text-gray-500">{th.description}</div>
+                    )}
                   </button>
                 ))}
               </div>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { createTourPost } from '@/lib/partners';
+import { getTrailheads, Trailhead } from '@/lib/trailheads';
 
 const EXPERIENCE_LEVELS = [
   { value: '', label: 'Any level welcome' },
@@ -14,14 +15,7 @@ const EXPERIENCE_LEVELS = [
   { value: 'expert', label: 'Expert only' },
 ];
 
-const TRAILHEADS = [
-  { value: 'washington_gulch', label: 'Washington Gulch' },
-  { value: 'snodgrass', label: 'Snodgrass' },
-  { value: 'kebler', label: 'Kebler Pass' },
-  { value: 'brush_creek', label: 'Brush Creek' },
-  { value: 'cement_creek', label: 'Cement Creek' },
-  { value: 'slate_river', label: 'Slate River' },
-];
+// Trailheads are now fetched from the database
 
 export default function NewTourPostPage() {
   const router = useRouter();
@@ -42,6 +36,12 @@ export default function NewTourPostPage() {
   const [requireShovel, setRequireShovel] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [trailheads, setTrailheads] = useState<Trailhead[]>([]);
+
+  // Fetch trailheads from database
+  useEffect(() => {
+    getTrailheads().then(setTrailheads);
+  }, []);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -278,9 +278,9 @@ export default function NewTourPostPage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               >
                 <option value="">Select a trailhead...</option>
-                {TRAILHEADS.map((th) => (
-                  <option key={th.value} value={th.value}>
-                    {th.label}
+                {trailheads.map((th) => (
+                  <option key={th.slug} value={th.slug}>
+                    {th.name}
                   </option>
                 ))}
               </select>
