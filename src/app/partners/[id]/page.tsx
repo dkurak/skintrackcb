@@ -8,12 +8,19 @@ import {
   getTourPost,
   getTourResponses,
   getTourParticipants,
+  getTourParticipantsWithContact,
+  getTourMessages,
   createTourResponse,
+  createTourMessage,
   updateTourResponseStatus,
+  updateTourStatus,
+  updateTourPlanningNotes,
   deleteTourPost,
   TourPost,
   TourResponse,
   TourParticipant,
+  TourParticipantWithContact,
+  TourMessage,
 } from '@/lib/partners';
 
 const EXPERIENCE_LABELS: Record<string, string> = {
@@ -32,9 +39,15 @@ export default function TourPostPage() {
   const [post, setPost] = useState<TourPost | null>(null);
   const [responses, setResponses] = useState<TourResponse[]>([]);
   const [participants, setParticipants] = useState<TourParticipant[]>([]);
+  const [participantsWithContact, setParticipantsWithContact] = useState<TourParticipantWithContact[]>([]);
+  const [messages, setMessages] = useState<TourMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
+  const [newMessage, setNewMessage] = useState('');
+  const [planningNotes, setPlanningNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
+  const [isSavingNotes, setIsSavingNotes] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -43,12 +56,17 @@ export default function TourPostPage() {
   const isAccepted = userResponse?.status === 'accepted';
   const isPending = userResponse?.status === 'pending';
   const hasResponded = !!userResponse;
+  const isParticipant = isOwner || isAccepted;
+  const isConfirmed = post?.status === 'confirmed' || post?.status === 'completed';
 
   useEffect(() => {
     async function loadData() {
       setLoading(true);
       const postData = await getTourPost(postId);
       setPost(postData);
+      if (postData) {
+        setPlanningNotes(postData.planning_notes || '');
+      }
 
       if (postData) {
         const [responseData, participantData] = await Promise.all([
@@ -62,6 +80,29 @@ export default function TourPostPage() {
     }
     loadData();
   }, [postId]);
+
+  // Load messages and contact info for participants
+  useEffect(() => {
+    async function loadParticipantData() {
+      if (!post || !user) return;
+
+      const userIsParticipant = post.user_id === user.id ||
+        responses.some(r => r.user_id === user.id && r.status === 'accepted');
+
+      if (!userIsParticipant) return;
+
+      // Load messages
+      const messagesData = await getTourMessages(postId);
+      setMessages(messagesData);
+
+      // Load contact info if tour is confirmed
+      if (post.status === 'confirmed' || post.status === 'completed') {
+        const contactData = await getTourParticipantsWithContact(postId, post.user_id);
+        setParticipantsWithContact(contactData);
+      }
+    }
+    loadParticipantData();
+  }, [post, user, responses, postId]);
 
   const handleSubmitInterest = async () => {
     if (!user) {
@@ -113,6 +154,51 @@ export default function TourPostPage() {
     } else {
       router.push('/partners');
     }
+  };
+
+  const handleStatusChange = async (newStatus: 'confirmed' | 'completed') => {
+    const { error: statusError } = await updateTourStatus(postId, newStatus);
+
+    if (statusError) {
+      setError(statusError.message);
+    } else {
+      // Refresh post data
+      const postData = await getTourPost(postId);
+      setPost(postData);
+      // Load contact info if now confirmed
+      if (postData && (postData.status === 'confirmed' || postData.status === 'completed')) {
+        const contactData = await getTourParticipantsWithContact(postId, postData.user_id);
+        setParticipantsWithContact(contactData);
+      }
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!user || !newMessage.trim()) return;
+
+    setIsSendingMessage(true);
+    const { data, error: msgError } = await createTourMessage(postId, user.id, newMessage.trim());
+
+    if (msgError) {
+      setError(msgError.message);
+    } else if (data) {
+      setMessages([...messages, data]);
+      setNewMessage('');
+    }
+    setIsSendingMessage(false);
+  };
+
+  const handleSavePlanningNotes = async () => {
+    setIsSavingNotes(true);
+    const { error: notesError } = await updateTourPlanningNotes(postId, planningNotes);
+
+    if (notesError) {
+      setError(notesError.message);
+    } else {
+      setSuccess('Planning notes saved!');
+      setTimeout(() => setSuccess(null), 2000);
+    }
+    setIsSavingNotes(false);
   };
 
   if (loading || authLoading) {
@@ -173,14 +259,18 @@ export default function TourPostPage() {
           </div>
           <span
             className={`px-3 py-1 rounded-full text-sm font-medium ${
-              post.status === 'open'
+              post.status === 'confirmed'
+                ? 'bg-blue-100 text-blue-700'
+                : post.status === 'open'
                 ? 'bg-green-100 text-green-700'
                 : post.status === 'full'
                 ? 'bg-yellow-100 text-yellow-700'
+                : post.status === 'completed'
+                ? 'bg-purple-100 text-purple-700'
                 : 'bg-gray-100 text-gray-700'
             }`}
           >
-            {post.status.charAt(0).toUpperCase() + post.status.slice(1)}
+            {post.status === 'confirmed' ? "It's On!" : post.status.charAt(0).toUpperCase() + post.status.slice(1)}
           </span>
         </div>
 
@@ -291,7 +381,23 @@ export default function TourPostPage() {
 
         {/* Owner actions */}
         {isOwner && (
-          <div className="pt-4 border-t border-gray-200 flex gap-2">
+          <div className="pt-4 border-t border-gray-200 flex flex-wrap gap-2">
+            {post.status === 'open' && participants.length > 0 && (
+              <button
+                onClick={() => handleStatusChange('confirmed')}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+              >
+                Confirm Tour - It&apos;s On!
+              </button>
+            )}
+            {(post.status === 'open' || post.status === 'confirmed') && (
+              <button
+                onClick={() => handleStatusChange('completed')}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
+              >
+                Mark Completed
+              </button>
+            )}
             <button
               onClick={handleDelete}
               className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg text-sm font-medium transition-colors"
@@ -439,6 +545,144 @@ export default function TourPostPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Contact Info (for confirmed tours - visible to participants) */}
+      {isParticipant && isConfirmed && participantsWithContact.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-blue-900 mb-4">
+            Contact Info
+          </h2>
+          <div className="space-y-3">
+            {participantsWithContact.map((p) => (
+              <div key={p.user_id} className="flex items-center justify-between">
+                <div>
+                  <span className="font-medium text-blue-900">
+                    {p.display_name || 'Anonymous'}
+                  </span>
+                  {p.user_id === post.user_id && (
+                    <span className="ml-2 text-xs bg-blue-200 text-blue-800 px-2 py-0.5 rounded">
+                      Organizer
+                    </span>
+                  )}
+                </div>
+                <div className="text-sm text-blue-800">
+                  {p.phone && (
+                    <a href={`tel:${p.phone}`} className="hover:underline">
+                      {p.phone}
+                    </a>
+                  )}
+                  {p.phone && p.email && <span className="mx-2">•</span>}
+                  {p.email && (
+                    <a href={`mailto:${p.email}`} className="hover:underline">
+                      {p.email}
+                    </a>
+                  )}
+                  {!p.phone && !p.email && (
+                    <span className="text-blue-600 italic">No contact info</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Planning Notes (editable by owner, visible to participants) */}
+      {isParticipant && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Planning Notes
+          </h2>
+          {isOwner ? (
+            <div className="space-y-3">
+              <textarea
+                value={planningNotes}
+                onChange={(e) => setPlanningNotes(e.target.value)}
+                rows={4}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                placeholder="Add route plans, meeting details, Plan A/B, etc."
+              />
+              <button
+                onClick={handleSavePlanningNotes}
+                disabled={isSavingNotes}
+                className="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 disabled:opacity-50 transition-colors"
+              >
+                {isSavingNotes ? 'Saving...' : 'Save Notes'}
+              </button>
+            </div>
+          ) : (
+            <div className="text-gray-700 whitespace-pre-line">
+              {planningNotes || <span className="text-gray-400 italic">No planning notes yet.</span>}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Discussion Thread (for participants) */}
+      {isParticipant && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Discussion
+          </h2>
+
+          {/* Messages */}
+          {messages.length > 0 ? (
+            <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`p-3 rounded-lg ${
+                    msg.user_id === user?.id
+                      ? 'bg-blue-50 ml-8'
+                      : 'bg-gray-50 mr-8'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-medium text-sm text-gray-900">
+                      {msg.profiles?.display_name || 'Anonymous'}
+                    </span>
+                    {msg.user_id === post.user_id && (
+                      <span className="text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">
+                        Organizer
+                      </span>
+                    )}
+                    <span className="text-xs text-gray-400">
+                      {new Date(msg.created_at).toLocaleString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-700">{msg.content}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-400 italic mb-6">No messages yet. Start the conversation!</p>
+          )}
+
+          {/* New message input */}
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+              placeholder="Type a message..."
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={isSendingMessage || !newMessage.trim()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isSendingMessage ? '...' : 'Send'}
+            </button>
           </div>
         </div>
       )}

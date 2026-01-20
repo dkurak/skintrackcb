@@ -27,7 +27,8 @@ export interface TourPost {
   experience_required: 'beginner' | 'intermediate' | 'advanced' | 'expert' | null;
   spots_available: number;
   gear_requirements: string[] | null;
-  status: 'open' | 'full' | 'cancelled' | 'completed';
+  status: 'open' | 'confirmed' | 'full' | 'cancelled' | 'completed';
+  planning_notes: string | null;
   created_at: string;
   updated_at: string;
   // Joined profile data
@@ -62,6 +63,26 @@ export interface TourParticipant {
   user_id: string;
   display_name: string | null;
   experience_level: string | null;
+}
+
+// Participant with contact info (for confirmed tours)
+export interface TourParticipantWithContact extends TourParticipant {
+  phone: string | null;
+  email: string | null;
+}
+
+// Tour discussion message
+export interface TourMessage {
+  id: string;
+  tour_id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  // Joined profile data
+  profiles?: {
+    display_name: string | null;
+  };
 }
 
 // Filter options for tour posts
@@ -217,7 +238,7 @@ export async function getMyTourPosts(userId: string): Promise<TourPost[]> {
 // Create a tour post
 export async function createTourPost(
   userId: string,
-  post: Omit<TourPost, 'id' | 'user_id' | 'status' | 'created_at' | 'updated_at' | 'profiles'>
+  post: Omit<TourPost, 'id' | 'user_id' | 'status' | 'created_at' | 'updated_at' | 'profiles' | 'planning_notes' | 'accepted_count'>
 ): Promise<{ data: TourPost | null; error: Error | null }> {
   if (!supabase) {
     return { data: null, error: new Error('Supabase not configured') };
@@ -423,4 +444,145 @@ export async function getPartnersLooking(zone?: string): Promise<{
   }
 
   return data;
+}
+
+// Get tour messages (discussion thread)
+export async function getTourMessages(tourId: string): Promise<TourMessage[]> {
+  if (!supabase) return [];
+  const client = supabase;
+
+  const fetchData = async () => {
+    const { data, error } = await client
+      .from('tour_messages')
+      .select(`
+        *,
+        profiles (
+          display_name
+        )
+      `)
+      .eq('tour_id', tourId)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching tour messages:', error);
+      return [];
+    }
+
+    return data as TourMessage[];
+  };
+
+  return withTimeout(fetchData(), 10000, []);
+}
+
+// Create a tour message
+export async function createTourMessage(
+  tourId: string,
+  userId: string,
+  content: string
+): Promise<{ data: TourMessage | null; error: Error | null }> {
+  if (!supabase) {
+    return { data: null, error: new Error('Supabase not configured') };
+  }
+
+  const { data, error } = await supabase
+    .from('tour_messages')
+    .insert({
+      tour_id: tourId,
+      user_id: userId,
+      content,
+    })
+    .select(`
+      *,
+      profiles (
+        display_name
+      )
+    `)
+    .single();
+
+  if (error) {
+    return { data: null, error: error as unknown as Error };
+  }
+
+  return { data: data as TourMessage, error: null };
+}
+
+// Get participants with contact info (for confirmed tours)
+export async function getTourParticipantsWithContact(
+  tourId: string,
+  tourOwnerId: string
+): Promise<TourParticipantWithContact[]> {
+  if (!supabase) return [];
+  const client = supabase;
+
+  const fetchData = async () => {
+    // Get accepted participants
+    const { data: responses, error: responsesError } = await client
+      .from('tour_responses')
+      .select('user_id')
+      .eq('tour_id', tourId)
+      .eq('status', 'accepted');
+
+    if (responsesError) {
+      console.error('Error fetching tour responses:', responsesError);
+      return [];
+    }
+
+    // Get user IDs (participants + organizer)
+    const userIds = [tourOwnerId, ...(responses?.map(r => r.user_id) || [])];
+
+    // Get profiles with contact info
+    const { data: profiles, error: profilesError } = await client
+      .from('profiles')
+      .select('id, display_name, experience_level, phone, email')
+      .in('id', userIds);
+
+    if (profilesError) {
+      console.error('Error fetching participant profiles:', profilesError);
+      return [];
+    }
+
+    return (profiles || []).map(p => ({
+      user_id: p.id,
+      display_name: p.display_name,
+      experience_level: p.experience_level,
+      phone: p.phone,
+      email: p.email,
+    }));
+  };
+
+  return withTimeout(fetchData(), 10000, []);
+}
+
+// Update tour status (for organizer)
+export async function updateTourStatus(
+  tourId: string,
+  status: 'open' | 'confirmed' | 'full' | 'cancelled' | 'completed'
+): Promise<{ error: Error | null }> {
+  if (!supabase) {
+    return { error: new Error('Supabase not configured') };
+  }
+
+  const { error } = await supabase
+    .from('tour_posts')
+    .update({ status })
+    .eq('id', tourId);
+
+  return { error: error as unknown as Error | null };
+}
+
+// Update tour planning notes
+export async function updateTourPlanningNotes(
+  tourId: string,
+  planningNotes: string
+): Promise<{ error: Error | null }> {
+  if (!supabase) {
+    return { error: new Error('Supabase not configured') };
+  }
+
+  const { error } = await supabase
+    .from('tour_posts')
+    .update({ planning_notes: planningNotes })
+    .eq('id', tourId);
+
+  return { error: error as unknown as Error | null };
 }
