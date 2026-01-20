@@ -111,29 +111,52 @@ function TourPostCard({ post, pendingCount }: { post: TourPost; pendingCount?: n
 
 export default function PartnersPage() {
   const { user, loading: authLoading } = useAuth();
-  const [posts, setPosts] = useState<TourPost[]>([]);
+  const [allPosts, setAllPosts] = useState<TourPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedZone, setSelectedZone] = useState<string | null>(null);
-  const [selectedActivity, setSelectedActivity] = useState<ActivityType | null>(null);
-  const [timeFrame, setTimeFrame] = useState<'upcoming' | 'past' | 'all'>('upcoming');
-  const [showMyTours, setShowMyTours] = useState(false);
+  const [selectedActivities, setSelectedActivities] = useState<Set<ActivityType>>(new Set());
+  const [timeFrame, setTimeFrame] = useState<'upcoming' | 'past'>('upcoming');
+  const [showMyTrips, setShowMyTrips] = useState(false);
   const [pendingCounts, setPendingCounts] = useState<Record<string, number>>({});
+
+  // Compute activity counts from loaded posts
+  const activityCounts = allPosts.reduce((acc, post) => {
+    const activity = post.activity || 'ski_tour';
+    acc[activity] = (acc[activity] || 0) + 1;
+    return acc;
+  }, {} as Record<ActivityType, number>);
+
+  // Filter posts by selected activities (client-side for multi-select)
+  const posts = selectedActivities.size === 0
+    ? allPosts
+    : allPosts.filter((p) => selectedActivities.has(p.activity || 'ski_tour'));
+
+  const toggleActivity = (activity: ActivityType) => {
+    setSelectedActivities((prev) => {
+      const next = new Set(prev);
+      if (next.has(activity)) {
+        next.delete(activity);
+      } else {
+        next.add(activity);
+      }
+      return next;
+    });
+  };
 
   useEffect(() => {
     async function loadPosts() {
       setLoading(true);
       const filters: TourFilters = {
         zone: selectedZone || undefined,
-        activity: selectedActivity || undefined,
         timeFrame,
-        userId: showMyTours && user ? user.id : undefined,
+        userId: showMyTrips && user ? user.id : undefined,
       };
       const data = await getTourPosts(filters);
-      setPosts(data);
+      setAllPosts(data);
       setLoading(false);
     }
     loadPosts();
-  }, [selectedZone, selectedActivity, timeFrame, showMyTours, user]);
+  }, [selectedZone, timeFrame, showMyTrips, user]);
 
   // Load pending counts for trips the user organizes
   useEffect(() => {
@@ -179,15 +202,15 @@ export default function PartnersPage() {
         )}
       </div>
 
-      {/* Filters - single row */}
+      {/* Filters */}
       <div className="flex flex-wrap items-center gap-2">
-        {/* My Tours (when logged in) */}
+        {/* My Trips toggle (when logged in) */}
         {user && (
           <>
             <button
-              onClick={() => { setShowMyTours(true); setTimeFrame('all'); }}
+              onClick={() => setShowMyTrips(!showMyTrips)}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                showMyTours
+                showMyTrips
                   ? 'bg-blue-600 text-white'
                   : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
               }`}
@@ -200,9 +223,9 @@ export default function PartnersPage() {
 
         {/* Time filters */}
         <button
-          onClick={() => { setTimeFrame('upcoming'); setShowMyTours(false); }}
+          onClick={() => setTimeFrame('upcoming')}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-            timeFrame === 'upcoming' && !showMyTours
+            timeFrame === 'upcoming'
               ? 'bg-gray-900 text-white'
               : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
           }`}
@@ -210,9 +233,9 @@ export default function PartnersPage() {
           Upcoming
         </button>
         <button
-          onClick={() => { setTimeFrame('past'); setShowMyTours(false); }}
+          onClick={() => setTimeFrame('past')}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-            timeFrame === 'past' && !showMyTours
+            timeFrame === 'past'
               ? 'bg-gray-900 text-white'
               : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
           }`}
@@ -220,22 +243,8 @@ export default function PartnersPage() {
           Past
         </button>
 
-        {/* Activity dropdown */}
-        <div className="ml-auto flex gap-2">
-          <select
-            value={selectedActivity || ''}
-            onChange={(e) => setSelectedActivity((e.target.value || null) as ActivityType | null)}
-            className="px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">All Activities</option>
-            {ALL_ACTIVITIES.map((act) => (
-              <option key={act} value={act}>
-                {ACTIVITY_ICONS[act]} {ACTIVITY_LABELS[act]}
-              </option>
-            ))}
-          </select>
-
-          {/* Zone dropdown */}
+        {/* Zone dropdown */}
+        <div className="ml-auto">
           <select
             value={selectedZone || ''}
             onChange={(e) => setSelectedZone(e.target.value || null)}
@@ -248,6 +257,36 @@ export default function PartnersPage() {
         </div>
       </div>
 
+      {/* Activity Stats Cards */}
+      {allPosts.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <div className="text-sm text-gray-600 mb-3">
+            Activities ({allPosts.length} total){selectedActivities.size > 0 && ` · ${posts.length} selected`}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {ALL_ACTIVITIES.map((activity) => {
+              const count = activityCounts[activity] || 0;
+              if (count === 0) return null;
+              const isSelected = selectedActivities.has(activity);
+              return (
+                <button
+                  key={activity}
+                  onClick={() => toggleActivity(activity)}
+                  className={`px-3 py-2 rounded-lg text-left transition-all ${
+                    isSelected
+                      ? `${ACTIVITY_COLORS[activity]} ring-2 ring-offset-1 ring-gray-400`
+                      : `${ACTIVITY_COLORS[activity]} opacity-70 hover:opacity-100`
+                  }`}
+                >
+                  <div className="text-xs font-medium">{ACTIVITY_LABELS[activity]}</div>
+                  <div className="text-lg font-bold">{count}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Trip posts list */}
       {loading ? (
         <div className="text-center py-12">
@@ -255,22 +294,22 @@ export default function PartnersPage() {
         </div>
       ) : posts.length === 0 ? (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-          <div className="text-4xl mb-4">{showMyTours ? '📋' : '🎿'}</div>
+          <div className="text-4xl mb-4">{showMyTrips ? '📋' : '🎿'}</div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {showMyTours
+            {showMyTrips
               ? 'No trips yet'
               : timeFrame === 'past'
               ? 'No past trips'
               : 'No upcoming trips'}
           </h3>
           <p className="text-gray-500 mb-4">
-            {showMyTours
+            {showMyTrips
               ? "You haven't organized or joined any trips yet."
               : timeFrame === 'past'
               ? 'Check upcoming trips to find partners!'
               : 'Be the first to post a trip and find partners!'}
           </p>
-          {!showMyTours && (
+          {!showMyTrips && (
             user ? (
               <Link
                 href="/trips/new"
