@@ -28,6 +28,7 @@ export default function NewTourPostPage() {
   const [zone, setZone] = useState('southeast');
   const [travelMethod, setTravelMethod] = useState<'skin' | 'snowmobile' | 'both'>('skin');
   const [trailhead, setTrailhead] = useState('');
+  const [otherTrailhead, setOtherTrailhead] = useState('');
   const [meetingLocation, setMeetingLocation] = useState('');
   const [experienceRequired, setExperienceRequired] = useState('');
   const [spotsAvailable, setSpotsAvailable] = useState('2');
@@ -82,6 +83,11 @@ export default function NewTourPostPage() {
     if (requireProbe) gearRequirements.push('Probe');
     if (requireShovel) gearRequirements.push('Shovel');
 
+    // Use custom trailhead text if "Other" was selected
+    const finalTrailhead = trailhead === '_other'
+      ? (otherTrailhead.trim() || null)
+      : (trailhead || null);
+
     const { data, error: createError } = await createTourPost(user.id, {
       title: title.trim(),
       description: description.trim() || null,
@@ -89,7 +95,7 @@ export default function NewTourPostPage() {
       tour_time: tourTime || null,
       zone,
       travel_method: travelMethod,
-      trailhead: trailhead || null,
+      trailhead: finalTrailhead,
       meeting_location: meetingLocation.trim() || null,
       experience_required: experienceRequired as 'beginner' | 'intermediate' | 'advanced' | 'expert' | null || null,
       spots_available: parseInt(spotsAvailable) || 2,
@@ -268,13 +274,18 @@ export default function NewTourPostPage() {
           </div>
 
           {(travelMethod === 'skin' || travelMethod === 'both') && (
-            <div>
+            <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Trailhead
               </label>
               <select
                 value={trailhead}
-                onChange={(e) => setTrailhead(e.target.value)}
+                onChange={(e) => {
+                  setTrailhead(e.target.value);
+                  if (e.target.value !== '_other') {
+                    setOtherTrailhead('');
+                  }
+                }}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               >
                 <option value="">Select a trailhead...</option>
@@ -283,7 +294,17 @@ export default function NewTourPostPage() {
                     {th.name}
                   </option>
                 ))}
+                <option value="_other">Other...</option>
               </select>
+              {trailhead === '_other' && (
+                <input
+                  type="text"
+                  value={otherTrailhead}
+                  onChange={(e) => setOtherTrailhead(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="Enter trailhead name..."
+                />
+              )}
             </div>
           )}
 
