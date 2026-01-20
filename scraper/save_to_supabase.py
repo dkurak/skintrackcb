@@ -13,9 +13,10 @@ Environment variables required:
 
 import os
 import sys
+import re
 import argparse
 from datetime import datetime
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple
 from dataclasses import asdict
 from dotenv import load_dotenv
 
@@ -55,6 +56,97 @@ DANGER_TEXT = {
 }
 
 
+def analyze_trend(bottom_line: str, discussion: str) -> Tuple[str, Optional[str], Optional[str]]:
+    """
+    Analyze forecast text to determine trend, key message, and travel advice.
+
+    Returns:
+        Tuple of (trend, key_message, travel_advice)
+    """
+    text = f"{bottom_line or ''} {discussion or ''}"
+    text_lower = text.lower()
+
+    # Determine trend based on keywords
+    trend = "steady"  # default
+
+    # Storm incoming indicators
+    storm_patterns = [
+        "storm expected", "storm approaching", "storm arriving",
+        "snow expected", "snow arriving", "inches expected",
+        "accumulation expected", "danger is expected to rise",
+        "loading will", "new load"
+    ]
+    if any(pattern in text_lower for pattern in storm_patterns):
+        trend = "storm_incoming"
+
+    # Worsening indicators (if not already storm)
+    elif any(kw in text_lower for kw in [
+        "dangerous avalanche conditions", "heightened avalanche conditions",
+        "increasing", "elevated danger"
+    ]):
+        trend = "worsening"
+
+    # Improving indicators
+    elif any(kw in text_lower for kw in [
+        "adjusting", "stabiliz", "decreased", "isolated",
+        "stubborn", "unlikely", "slowly improved", "conditions have improved"
+    ]):
+        trend = "improving"
+
+    # Extract key message - look for actionable sentences
+    key_message = None
+    sentences = re.split(r'[.!]', text)
+
+    key_patterns = [
+        r'expect\s+\w+',
+        r'avoid\s+\w+',
+        r'stay\s+(below|under|off|away)',
+        r'do\s+not',
+        r'give\s+yourself.*margin',
+        r'safest.*terrain',
+        r'you can trigger',
+        r'dangerous\s+\w+',
+    ]
+
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if len(sentence) < 15:
+            continue
+        for pattern in key_patterns:
+            if re.search(pattern, sentence.lower()):
+                key_message = sentence[:300]  # Limit length
+                break
+        if key_message:
+            break
+
+    # If no key message found, use first meaningful sentence
+    if not key_message:
+        for sentence in sentences:
+            sentence = sentence.strip()
+            if len(sentence) > 30:
+                key_message = sentence[:300]
+                break
+
+    # Extract travel advice
+    travel_advice = None
+    travel_patterns = [
+        r'(the safest[^.]+\.)',
+        r'(you can reduce[^.]+\.)',
+        r'(avoid[^.]+\.)',
+        r'(lower elevation[^.]+\.)',
+        r'(wind.protected[^.]+\.)',
+        r'(best.*riding[^.]+\.)',
+    ]
+
+    for pattern in travel_patterns:
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match:
+            travel_advice = match.group(1).strip()[:300]
+            break
+
+    return trend, key_message, travel_advice
+
+
 def get_supabase_client() -> Client:
     """Create and return a Supabase client."""
     return create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
@@ -77,6 +169,12 @@ def save_forecast(client: Client, forecast: Forecast) -> Optional[str]:
             forecast.danger_below_treeline
         )
 
+        # Analyze trend and extract key message
+        trend, key_message, travel_advice = analyze_trend(
+            forecast.bottom_line or "",
+            forecast.discussion or ""
+        )
+
         # Prepare forecast data
         forecast_data = {
             "zone_id": forecast.zone,
@@ -91,6 +189,9 @@ def save_forecast(client: Client, forecast: Forecast) -> Optional[str]:
             "bottom_line": forecast.bottom_line,
             "discussion": forecast.discussion,
             "forecast_url": forecast.forecast_url,
+            "trend": trend,
+            "key_message": key_message,
+            "travel_advice": travel_advice,
             "raw_data": {
                 "scraped_at": datetime.now().isoformat(),
                 "weather": forecast.weather,
@@ -106,6 +207,7 @@ def save_forecast(client: Client, forecast: Forecast) -> Optional[str]:
         if result.data and len(result.data) > 0:
             forecast_id = result.data[0]["id"]
             print(f"  Saved forecast for {forecast.zone_name} ({forecast.valid_date})")
+            print(f"    Trend: {trend}")
 
             # Delete existing problems for this forecast (to handle updates)
             client.table("avalanche_problems").delete().eq(
