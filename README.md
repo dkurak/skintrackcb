@@ -1,36 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SkinTrack CB
 
-## Getting Started
+A mobile-first web app for Crested Butte backcountry skiers and riders. Aggregates CBAC (Crested Butte Avalanche Center) forecasts with historical data and trend analysis.
 
-First, run the development server:
+**Live:** [skintrackcb.vercel.app](https://skintrackcb.vercel.app)
+
+## Features
+
+### Avalanche Forecasts
+- **Current Conditions** - Today's danger pyramid (Alpine, Treeline, Below Treeline) for Northwest and Southeast zones
+- **Avalanche Problems** - Active problems with likelihood, size, and affected aspects/elevations
+- **Bottom Line** - Key summary and travel advice from CBAC forecasters
+
+### History & Trends
+- **Historical Browser** - Scroll through past forecasts to spot patterns
+- **Trend Analysis** - Each forecast shows trend compared to previous day:
+  - Improving (danger sum decreased)
+  - Steady (no change)
+  - Worsening (danger sum increased)
+  - Storm Incoming (based on forecast text)
+- **Quick Take** - Extracted key message and travel advice for each day
+
+### Weather
+- Zone-specific weather forecasts (Northwest & Southeast)
+- Key metrics: temperature, wind, precipitation
+
+### Tours & Partners
+- Browse upcoming backcountry tours
+- Post your own tours with date, trailhead, and objectives
+- Find partners for your trips
+
+### Admin Features
+- Trailhead management (add/edit/delete trailheads)
+- Test user creation for development/demos
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | Next.js 14 (React), Tailwind CSS |
+| Database | Supabase (PostgreSQL) |
+| Auth | Supabase Auth |
+| Hosting | Vercel |
+| Scraper | Python (runs via GitHub Actions) |
+| Analytics | Vercel Analytics |
+
+## Data Collection
+
+Forecasts are automatically scraped daily from CBAC via GitHub Actions:
+- Runs at 6 AM and 6 PM Mountain Time
+- Stores danger levels, problems, bottom line, and weather
+- Calculates trends by comparing to previous day's data
+
+## Local Development
+
+### Prerequisites
+- Node.js 20+
+- Python 3.11+ (for scraper)
+- Supabase account
+
+### Setup
+
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/dkurak/skintrackcb.git
+   cd skintrackcb
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Set up environment variables:
+   ```bash
+   cp .env.local.example .env.local
+   # Edit .env.local with your Supabase credentials
+   ```
+
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000)
+
+### Scraper Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd scraper
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Copy and configure .env
+cp .env.example .env
+# Add SUPABASE_URL and SUPABASE_SERVICE_KEY
+
+# Run manually
+python save_to_supabase.py
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Database Migrations
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Migrations are in `supabase/migrations/`. Run them in order via the Supabase SQL Editor.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## License
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
