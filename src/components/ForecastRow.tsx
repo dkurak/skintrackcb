@@ -1,6 +1,6 @@
 'use client';
 
-import { Forecast, DANGER_LABELS, ForecastWeather, ForecastTrend, TREND_LABELS, TREND_COLORS } from '@/types/forecast';
+import { Forecast, AvalancheProblem, DANGER_LABELS, ForecastWeather, ForecastTrend, TREND_LABELS, TREND_COLORS } from '@/types/forecast';
 import { DangerPyramid } from './DangerPyramid';
 import { AspectRose } from './AspectRose';
 import { PROBLEM_LABELS } from '@/types/forecast';
@@ -16,6 +16,76 @@ function getTrendIcon(trend: ForecastTrend | undefined): string {
     case 'new_problem': return '!';
     default: return '→';
   }
+}
+
+// Count active cells in aspect/elevation rose
+function countActiveCells(rose: AvalancheProblem['aspect_elevation']): number {
+  let count = 0;
+  const aspects = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'] as const;
+  const elevations = ['alpine', 'treeline', 'below_treeline'] as const;
+
+  for (const aspect of aspects) {
+    for (const elev of elevations) {
+      if (rose[aspect]?.[elev]) count++;
+    }
+  }
+  return count;
+}
+
+// Calculate total problem coverage across all problems
+function getTotalProblemCoverage(problems: AvalancheProblem[]): number {
+  return problems.reduce((sum, p) => sum + countActiveCells(p.aspect_elevation), 0);
+}
+
+// Calculate trend by comparing to previous forecast
+function calculateTrend(current: Forecast, previous?: Forecast): ForecastTrend | undefined {
+  if (!previous) return undefined;
+
+  const currentMaxDanger = Math.max(
+    current.danger_alpine,
+    current.danger_treeline,
+    current.danger_below_treeline
+  );
+  const previousMaxDanger = Math.max(
+    previous.danger_alpine,
+    previous.danger_treeline,
+    previous.danger_below_treeline
+  );
+
+  // Check for new problem types
+  const currentTypes = new Set(current.problems.map(p => p.type));
+  const previousTypes = new Set(previous.problems.map(p => p.type));
+  const hasNewProblemType = [...currentTypes].some(t => !previousTypes.has(t));
+
+  // Calculate problem coverage
+  const currentCoverage = getTotalProblemCoverage(current.problems);
+  const previousCoverage = getTotalProblemCoverage(previous.problems);
+
+  // Determine trend based on multiple factors
+  // Worsening: danger increased, or new problem type, or significantly more coverage
+  if (currentMaxDanger > previousMaxDanger) {
+    return 'worsening';
+  }
+  if (hasNewProblemType) {
+    return 'new_problem';
+  }
+  if (currentCoverage > previousCoverage * 1.25) {
+    return 'worsening';
+  }
+
+  // Improving: danger decreased, or problem resolved, or significantly less coverage
+  if (currentMaxDanger < previousMaxDanger) {
+    return 'improving';
+  }
+  if (current.problems.length < previous.problems.length) {
+    return 'improving';
+  }
+  if (currentCoverage < previousCoverage * 0.75) {
+    return 'improving';
+  }
+
+  // Steady: no significant changes
+  return 'steady';
 }
 
 // Weather display with fixed-width columns for alignment
@@ -108,6 +178,9 @@ function getChanges(current: Forecast, previous?: Forecast): string[] {
 }
 
 export function ForecastRow({ forecast, previousForecast, weekForecasts, expanded = false, onToggle }: ForecastRowProps) {
+  // Calculate trend by comparing to previous forecast (instead of using keyword-based DB field)
+  const trend = calculateTrend(forecast, previousForecast);
+
   // Get 7-day analysis if we have the forecasts
   const insights = weekForecasts && weekForecasts.length >= 2 ? analyzeWeek(weekForecasts) : [];
   const formatDate = (dateStr: string) => {
@@ -150,15 +223,15 @@ export function ForecastRow({ forecast, previousForecast, weekForecasts, expande
         </div>
 
         {/* Trend badge */}
-        {forecast.trend && (
+        {trend && trend !== 'steady' && (
           <div
             className="flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap"
             style={{
-              backgroundColor: TREND_COLORS[forecast.trend] + '20',
-              color: TREND_COLORS[forecast.trend],
+              backgroundColor: TREND_COLORS[trend] + '20',
+              color: TREND_COLORS[trend],
             }}
           >
-            {getTrendIcon(forecast.trend)} {TREND_LABELS[forecast.trend]}
+            {getTrendIcon(trend)} {TREND_LABELS[trend]}
           </div>
         )}
 
