@@ -22,21 +22,8 @@ function getWeekStart(date: Date): Date {
   return d;
 }
 
-// Get week label based on date
-function getWeekLabel(weekStart: Date): string {
-  const now = new Date();
-  const thisWeekStart = getWeekStart(now);
-  const nextWeekStart = new Date(thisWeekStart);
-  nextWeekStart.setDate(nextWeekStart.getDate() + 7);
-
-  if (weekStart.getTime() === thisWeekStart.getTime()) {
-    return 'This Week';
-  }
-  if (weekStart.getTime() === nextWeekStart.getTime()) {
-    return 'Next Week';
-  }
-
-  // Format as "Jan 27 - Feb 2"
+// Format date range for a week
+function formatWeekRange(weekStart: Date): string {
   const weekEnd = new Date(weekStart);
   weekEnd.setDate(weekEnd.getDate() + 6);
 
@@ -51,10 +38,38 @@ function getWeekLabel(weekStart: Date): string {
   return `${startMonth} ${startDay} - ${endMonth} ${endDay}`;
 }
 
+// Get week label based on date
+function getWeekLabel(weekStart: Date): { title: string; dateRange: string; category: 'this' | 'next' | 'future' } {
+  const now = new Date();
+  const thisWeekStart = getWeekStart(now);
+  const nextWeekStart = new Date(thisWeekStart);
+  nextWeekStart.setDate(nextWeekStart.getDate() + 7);
+
+  const dateRange = formatWeekRange(weekStart);
+
+  if (weekStart.getTime() === thisWeekStart.getTime()) {
+    return { title: 'This Week', dateRange, category: 'this' };
+  }
+  if (weekStart.getTime() === nextWeekStart.getTime()) {
+    return { title: 'Next Week', dateRange, category: 'next' };
+  }
+
+  return { title: dateRange, dateRange, category: 'future' };
+}
+
 interface WeekGroup {
-  label: string;
+  title: string;
+  dateRange: string;
+  category: 'this' | 'next' | 'future';
   startDate: Date;
   trips: TourPost[];
+}
+
+interface CategoryGroup {
+  category: 'this' | 'next' | 'future';
+  label: string;
+  weeks: WeekGroup[];
+  totalTrips: number;
 }
 
 // Group trips by week
@@ -67,8 +82,11 @@ function groupTripsByWeek(trips: TourPost[]): WeekGroup[] {
     const key = weekStart.getTime();
 
     if (!groups.has(key)) {
+      const { title, dateRange, category } = getWeekLabel(weekStart);
       groups.set(key, {
-        label: getWeekLabel(weekStart),
+        title,
+        dateRange,
+        category,
         startDate: weekStart,
         trips: [],
       });
@@ -80,6 +98,69 @@ function groupTripsByWeek(trips: TourPost[]): WeekGroup[] {
   return Array.from(groups.values()).sort(
     (a, b) => a.startDate.getTime() - b.startDate.getTime()
   );
+}
+
+// Group weeks into categories (This Week, Next Week, Future)
+function groupWeeksByCategory(weeks: WeekGroup[]): CategoryGroup[] {
+  const categories: CategoryGroup[] = [];
+
+  const thisWeek = weeks.filter(w => w.category === 'this');
+  const nextWeek = weeks.filter(w => w.category === 'next');
+  const futureWeeks = weeks.filter(w => w.category === 'future');
+
+  if (thisWeek.length > 0) {
+    categories.push({
+      category: 'this',
+      label: 'This Week',
+      weeks: thisWeek,
+      totalTrips: thisWeek.reduce((sum, w) => sum + w.trips.length, 0),
+    });
+  }
+
+  if (nextWeek.length > 0) {
+    categories.push({
+      category: 'next',
+      label: 'Next Week',
+      weeks: nextWeek,
+      totalTrips: nextWeek.reduce((sum, w) => sum + w.trips.length, 0),
+    });
+  }
+
+  if (futureWeeks.length > 0) {
+    categories.push({
+      category: 'future',
+      label: 'Future',
+      weeks: futureWeeks,
+      totalTrips: futureWeeks.reduce((sum, w) => sum + w.trips.length, 0),
+    });
+  }
+
+  return categories;
+}
+
+interface MonthGroup {
+  label: string;
+  key: string;
+  trips: TourPost[];
+}
+
+// Group trips by month for past trips
+function groupTripsByMonth(trips: TourPost[]): MonthGroup[] {
+  const groups = new Map<string, MonthGroup>();
+
+  trips.forEach((trip) => {
+    const tripDate = new Date(trip.tour_date + 'T12:00:00');
+    const key = `${tripDate.getFullYear()}-${tripDate.getMonth()}`;
+    const label = tripDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    if (!groups.has(key)) {
+      groups.set(key, { label, key, trips: [] });
+    }
+    groups.get(key)!.trips.push(trip);
+  });
+
+  // Sort by date descending (most recent first)
+  return Array.from(groups.values()).sort((a, b) => b.key.localeCompare(a.key));
 }
 
 const ALL_ACTIVITIES: ActivityType[] = ['ski_tour', 'offroad', 'mountain_bike', 'trail_run', 'hike', 'climb'];
@@ -189,6 +270,32 @@ export default function PartnersPage() {
   const [showMyTrips, setShowMyTrips] = useState(false);
   const [pendingCounts, setPendingCounts] = useState<Record<string, number>>({});
   const [notifications, setNotifications] = useState<UserNotification[]>([]);
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['this', 'next', 'future']));
+  const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
+
+  const toggleCategory = (category: string) => {
+    setExpandedCategories(prev => {
+      const next = new Set(prev);
+      if (next.has(category)) {
+        next.delete(category);
+      } else {
+        next.add(category);
+      }
+      return next;
+    });
+  };
+
+  const toggleMonth = (key: string) => {
+    setExpandedMonths(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  };
 
   // Compute activity counts from loaded posts
   const activityCounts = allPosts.reduce((acc, post) => {
@@ -452,30 +559,97 @@ export default function PartnersPage() {
           )}
         </div>
       ) : timeFrame === 'upcoming' ? (
-        // Weekly grouped view for upcoming trips
-        <div className="space-y-6">
-          {groupTripsByWeek(posts).map((week) => (
-            <div key={week.startDate.getTime()}>
-              <div className="sticky top-0 z-10 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 mb-3 flex items-center justify-between">
-                <span className="font-semibold text-gray-900">{week.label}</span>
-                <span className="text-sm text-gray-500">
-                  {week.trips.length} {week.trips.length === 1 ? 'trip' : 'trips'}
-                </span>
+        // Categorized view for upcoming trips (This Week, Next Week, Future)
+        <div className="space-y-4">
+          {groupWeeksByCategory(groupTripsByWeek(posts)).map((category) => {
+            const isExpanded = expandedCategories.has(category.category);
+            return (
+              <div key={category.category} className="border border-gray-200 rounded-xl overflow-hidden">
+                <button
+                  onClick={() => toggleCategory(category.category)}
+                  className="w-full bg-gray-50 px-4 py-3 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <svg
+                      className={`w-5 h-5 text-gray-500 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                    <span className="font-semibold text-gray-900">{category.label}</span>
+                    {category.category !== 'future' && category.weeks[0] && (
+                      <span className="text-sm text-gray-500">({category.weeks[0].dateRange})</span>
+                    )}
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    {category.totalTrips} {category.totalTrips === 1 ? 'trip' : 'trips'}
+                  </span>
+                </button>
+                {isExpanded && (
+                  <div className="p-4 space-y-4 bg-white">
+                    {category.category === 'future' ? (
+                      // For future, show week subgroups
+                      category.weeks.map((week) => (
+                        <div key={week.startDate.getTime()}>
+                          <div className="text-sm font-medium text-gray-500 mb-2">{week.dateRange}</div>
+                          <div className="space-y-3">
+                            {week.trips.map((post) => (
+                              <TourPostCard key={post.id} post={post} pendingCount={pendingCounts[post.id]} />
+                            ))}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      // For this/next week, show trips directly
+                      category.weeks.flatMap(w => w.trips).map((post) => (
+                        <TourPostCard key={post.id} post={post} pendingCount={pendingCounts[post.id]} />
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
-              <div className="space-y-4">
-                {week.trips.map((post) => (
-                  <TourPostCard key={post.id} post={post} pendingCount={pendingCounts[post.id]} />
-                ))}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
-        // Flat list for past trips
+        // Monthly grouped view for past trips
         <div className="space-y-4">
-          {posts.map((post) => (
-            <TourPostCard key={post.id} post={post} pendingCount={pendingCounts[post.id]} />
-          ))}
+          {groupTripsByMonth(posts).map((month, index) => {
+            // Auto-expand the first (most recent) month
+            const isExpanded = index === 0 || expandedMonths.has(month.key);
+            return (
+              <div key={month.key} className="border border-gray-200 rounded-xl overflow-hidden">
+                <button
+                  onClick={() => toggleMonth(month.key)}
+                  className="w-full bg-gray-50 px-4 py-3 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <svg
+                      className={`w-5 h-5 text-gray-500 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                    <span className="font-semibold text-gray-900">{month.label}</span>
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    {month.trips.length} {month.trips.length === 1 ? 'trip' : 'trips'}
+                  </span>
+                </button>
+                {isExpanded && (
+                  <div className="p-4 space-y-4 bg-white">
+                    {month.trips.map((post) => (
+                      <TourPostCard key={post.id} post={post} pendingCount={pendingCounts[post.id]} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 
