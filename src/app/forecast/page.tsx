@@ -169,7 +169,7 @@ function ConditionsTab({ selectedZone }: { selectedZone: 'northwest' | 'southeas
             <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
               Bottom Line
             </h2>
-            <p className="text-gray-700 leading-relaxed">{currentForecast.bottom_line}</p>
+            <p className="text-gray-700 leading-relaxed text-sm">{currentForecast.bottom_line}</p>
           </div>
         </div>
 
