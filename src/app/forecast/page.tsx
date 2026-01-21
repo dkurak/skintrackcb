@@ -255,6 +255,48 @@ function ConditionsTab({ selectedZone }: { selectedZone: 'northwest' | 'southeas
         </div>
       </div>
 
+      {/* CBAC Card */}
+      <div className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl border border-gray-200 p-4">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="text-2xl">⛰️</div>
+          <div className="flex-1">
+            <div className="font-semibold text-gray-900">Crested Butte Avalanche Center</div>
+            <div className="text-sm text-gray-600">
+              Official forecast source for this zone
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <a
+            href="https://cbavalanchecenter.org/forecasts/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+          >
+            Full Forecast
+          </a>
+          <a
+            href="https://cbavalanchecenter.org/observations/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+          >
+            Observations
+          </a>
+          <a
+            href="https://cbavalanchecenter.org/avalanches/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+          >
+            Avalanches
+          </a>
+        </div>
+        <div className="mt-3 text-xs text-gray-400">
+          Not affiliated with CBAC
+        </div>
+      </div>
+
       {/* Snowpack Card */}
       <a
         href="https://nwcc-apps.sc.egov.usda.gov/awdb/site-plots/POR/WTEQ/CO/Butte.html"
@@ -276,12 +318,12 @@ function ConditionsTab({ selectedZone }: { selectedZone: 'northwest' | 'southeas
         </div>
       </a>
 
-      {/* Data source notice */}
-      <div className="text-center py-2 text-sm text-gray-400">
-        {isSupabaseConfigured
-          ? <>Forecast data from <a href="https://cbavalanchecenter.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Crested Butte Avalanche Center</a>. Not affiliated with CBAC.</>
-          : 'Demo mode - Using mock data. Connect Supabase to see real forecasts.'}
-      </div>
+      {/* Demo mode notice */}
+      {!isSupabaseConfigured && (
+        <div className="text-center py-2 text-sm text-gray-400">
+          Demo mode - Using mock data. Connect Supabase to see real forecasts.
+        </div>
+      )}
     </div>
   );
 }
