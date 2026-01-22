@@ -12,30 +12,14 @@ _Features prioritized for upcoming work_
 
 ### Multi-Activity Platform Expansion
 
-- [ ] **Activity Type Support** (schema ready in migration 012)
-  - Support: ski touring, offroading, mountain biking, trail running, hiking, climbing
-  - Activity enum and details JSONB added to tour_posts
-  - Meeting points (trailheads) support multiple activity types
-  - User profiles track activity interests and per-activity experience
-  - Sample meeting points seeded for: CB area, Taylor Park, Moab
-
-- [ ] **UI Updates for Multi-Activity**
-  - Activity filter on tours browse page
-  - Activity selector on tour creation form
-  - Activity-specific icons and color coding
-  - Per-activity profile sections
-  - Seasonal activity suggestions
-
-- [ ] **Historical Data Demo**
-  - Function `generate_sample_activity_data()` creates 2+ years of seasonal trips
-  - Shows ski touring in winter, biking/hiking in summer
-  - Admin page button to regenerate demo data
-  - Demonstrates what app looks like with active community
-
 - [ ] **Rebranding for Multi-Activity**
   - New name (domain candidates: rallyday.com, sendday.com, outcrew.com, trailpack.com)
   - Activity-agnostic logo and branding
   - "SkinTrack" → new name throughout
+
+- [ ] **Per-Activity Profile Sections**
+  - Show activity-specific experience on profile
+  - Seasonal activity suggestions
 
 ---
 
@@ -132,6 +116,22 @@ _Features prioritized for upcoming work_
 ## Done
 _Shipped features (for reference)_
 
+- [x] **Activity Type Support** (Jan 2025)
+  - Activity enum and details JSONB on tour_posts
+  - Meeting points support multiple activity types
+  - User profiles track activity interests
+  - Sample meeting points for CB, Taylor Park, Moab
+- [x] **UI Updates for Multi-Activity** (Jan 2025)
+  - Activity filter on tours browse page
+  - Activity selector on tour creation form
+  - Activity-specific icons and color coding
+- [x] **Historical Data Demo** (Jan 2025)
+  - `generate_sample_activity_data()` creates 2+ years of seasonal trips
+  - Admin page button to regenerate demo data
+- [x] **Feature Flags System** (Jan 2025)
+  - Database-driven feature flags for activities and features
+  - Admin UI toggle switches at /admin
+  - Enables gradual rollout (ski touring first, add hiking later)
 - [x] Vercel Analytics for page views (Jan 2025)
 - [x] Trend analysis in forecasts - improving/steady/worsening (Jan 2025)
 - [x] Admin area with trailhead management (Jan 2025)
