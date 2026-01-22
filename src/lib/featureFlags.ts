@@ -105,3 +105,44 @@ export function clearFeatureFlagCache(): void {
 export async function preloadFeatureFlags(): Promise<void> {
   await getFeatureFlags();
 }
+
+// Maintenance mode types
+export interface MaintenanceMode {
+  enabled: boolean;
+  bypassPassword: string | null;
+  message: string;
+}
+
+// Get maintenance mode settings
+export async function getMaintenanceMode(): Promise<MaintenanceMode> {
+  const flags = await getFeatureFlags();
+  const flag = flags.get('system.maintenance_mode');
+
+  if (!flag) {
+    return {
+      enabled: false,
+      bypassPassword: null,
+      message: 'Site is under maintenance',
+    };
+  }
+
+  return {
+    enabled: flag.enabled,
+    bypassPassword: (flag.metadata?.bypass_password as string) || null,
+    message: (flag.metadata?.message as string) || 'Site is under maintenance',
+  };
+}
+
+// Synchronous maintenance mode check (for middleware after cache is warm)
+export function getMaintenanceModeSync(): MaintenanceMode | null {
+  if (!flagsCache) return null;
+
+  const flag = flagsCache.get('system.maintenance_mode');
+  if (!flag) return null;
+
+  return {
+    enabled: flag.enabled,
+    bypassPassword: (flag.metadata?.bypass_password as string) || null,
+    message: (flag.metadata?.message as string) || 'Site is under maintenance',
+  };
+}

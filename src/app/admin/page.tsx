@@ -13,6 +13,12 @@ interface FeatureFlag {
   description: string | null;
 }
 
+interface MaintenanceSettings {
+  enabled: boolean;
+  bypassPassword: string;
+  message: string;
+}
+
 interface TestUser {
   id: string;
   email: string;
@@ -41,12 +47,19 @@ export default function AdminPage() {
   const [totalTrips, setTotalTrips] = useState(0);
   const [featureFlags, setFeatureFlags] = useState<FeatureFlag[]>([]);
   const [flagsLoading, setFlagsLoading] = useState(false);
+  const [maintenance, setMaintenance] = useState<MaintenanceSettings>({
+    enabled: false,
+    bypassPassword: '',
+    message: 'We are currently working on something exciting. Check back soon!',
+  });
+  const [maintenanceLoading, setMaintenanceLoading] = useState(false);
 
   // Fetch test users, stats, and feature flags on load
   useEffect(() => {
     fetchTestUsers();
     fetchActivityStats();
     fetchFeatureFlags();
+    fetchMaintenanceSettings();
   }, []);
 
   const fetchActivityStats = async () => {
@@ -131,6 +144,86 @@ export default function AdminPage() {
     } catch (error) {
       console.error('Error fetching feature flags:', error);
     }
+  };
+
+  const fetchMaintenanceSettings = async () => {
+    if (!supabase) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('feature_flags')
+        .select('enabled, metadata')
+        .eq('key', 'system.maintenance_mode')
+        .single();
+
+      if (error) {
+        console.error('Error fetching maintenance settings:', error);
+        return;
+      }
+
+      if (data) {
+        setMaintenance({
+          enabled: data.enabled,
+          bypassPassword: (data.metadata?.bypass_password as string) || '',
+          message: (data.metadata?.message as string) || 'We are currently working on something exciting. Check back soon!',
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching maintenance settings:', error);
+    }
+  };
+
+  const handleMaintenanceToggle = async () => {
+    if (!supabase) return;
+
+    setMaintenanceLoading(true);
+    try {
+      const { error } = await supabase
+        .from('feature_flags')
+        .update({ enabled: !maintenance.enabled })
+        .eq('key', 'system.maintenance_mode');
+
+      if (error) {
+        setMessage({ type: 'error', text: `Failed to toggle maintenance mode: ${error.message}` });
+      } else {
+        setMaintenance(prev => ({ ...prev, enabled: !prev.enabled }));
+        clearFeatureFlagCache();
+        setMessage({
+          type: 'success',
+          text: `Maintenance mode ${!maintenance.enabled ? 'enabled' : 'disabled'}`
+        });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to toggle maintenance mode' });
+    }
+    setMaintenanceLoading(false);
+  };
+
+  const handleMaintenanceUpdate = async () => {
+    if (!supabase) return;
+
+    setMaintenanceLoading(true);
+    try {
+      const { error } = await supabase
+        .from('feature_flags')
+        .update({
+          metadata: {
+            bypass_password: maintenance.bypassPassword || null,
+            message: maintenance.message,
+          },
+        })
+        .eq('key', 'system.maintenance_mode');
+
+      if (error) {
+        setMessage({ type: 'error', text: `Failed to update settings: ${error.message}` });
+      } else {
+        clearFeatureFlagCache();
+        setMessage({ type: 'success', text: 'Maintenance settings updated' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to update settings' });
+    }
+    setMaintenanceLoading(false);
   };
 
   const handleToggleFlag = async (key: string, currentEnabled: boolean) => {
@@ -380,6 +473,88 @@ export default function AdminPage() {
         </div>
       )}
 
+      {/* Maintenance Mode */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Site Access Control
+            </h2>
+            <p className="text-sm text-gray-500">
+              Lock down the site with a &quot;Coming Soon&quot; page. Admins always have access.
+            </p>
+          </div>
+          <button
+            onClick={handleMaintenanceToggle}
+            disabled={maintenanceLoading}
+            className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+              maintenance.enabled ? 'bg-red-500' : 'bg-gray-300'
+            } ${maintenanceLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <span
+              className={`inline-block h-6 w-6 transform rounded-full bg-white shadow transition-transform ${
+                maintenance.enabled ? 'translate-x-7' : 'translate-x-1'
+              }`}
+            />
+          </button>
+        </div>
+
+        <div className={`space-y-4 ${maintenance.enabled ? '' : 'opacity-50'}`}>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Bypass Password
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={maintenance.bypassPassword}
+                onChange={(e) => setMaintenance(prev => ({ ...prev, bypassPassword: e.target.value }))}
+                placeholder="Leave empty to disable password bypass"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Visitors can enter this password to access the site
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Message
+            </label>
+            <textarea
+              value={maintenance.message}
+              onChange={(e) => setMaintenance(prev => ({ ...prev, message: e.target.value }))}
+              rows={2}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            />
+          </div>
+
+          <button
+            onClick={handleMaintenanceUpdate}
+            disabled={maintenanceLoading}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors text-sm"
+          >
+            {maintenanceLoading ? 'Saving...' : 'Save Settings'}
+          </button>
+        </div>
+
+        {maintenance.enabled && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center gap-2 text-red-700">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span className="font-medium">Maintenance Mode Active</span>
+            </div>
+            <p className="text-sm text-red-600 mt-1">
+              Non-admin visitors will see the &quot;Coming Soon&quot; page.
+              {maintenance.bypassPassword && ' They can enter the bypass password to access the site.'}
+            </p>
+          </div>
+        )}
+      </div>
+
       {/* Feature Flags */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
@@ -389,7 +564,7 @@ export default function AdminPage() {
           Toggle activities and features on/off. Changes take effect immediately.
         </p>
 
-        {featureFlags.length === 0 ? (
+        {featureFlags.filter(f => !f.key.startsWith('system.')).length === 0 ? (
           <p className="text-gray-500">No feature flags found. Run the migration first.</p>
         ) : (
           <div className="space-y-6">
