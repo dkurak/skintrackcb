@@ -50,14 +50,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <span className="font-bold text-lg">Admin</span>
-            <nav className="flex gap-4 text-sm">
-              <Link href="/admin" className="hover:text-blue-300 transition-colors">
-                Test Users
-              </Link>
-              <Link href="/admin/trailheads" className="hover:text-blue-300 transition-colors">
-                Trailheads
-              </Link>
-            </nav>
           </div>
           <div className="text-sm text-gray-400">
             {profile.email}

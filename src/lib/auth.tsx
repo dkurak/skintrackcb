@@ -100,7 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Get initial session
     supabase.auth.getSession()
-      .then(({ data: { session }, error }) => {
+      .then(async ({ data: { session }, error }) => {
         if (!mounted) return;
         if (error) {
           console.error('Error getting session:', error);
@@ -110,11 +110,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          fetchProfile(session.user.id).then(profileData => {
-            if (mounted) setProfile(profileData);
-          });
+          const profileData = await fetchProfile(session.user.id);
+          if (mounted) setProfile(profileData);
         }
-        setLoading(false);
+        if (mounted) setLoading(false);
       })
       .catch((err) => {
         console.error('Auth initialization error:', err);
