@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
+import { useTheme } from '@/lib/theme';
 import { getTripsAwaitingResponse, getTripsWithPendingRequests, getUserNotifications, deleteNotification, TourPost, UserNotification, ACTIVITY_COLORS, ACTIVITY_ICONS } from '@/lib/partners';
 
 function formatTimeAgo(dateString: string): string {
@@ -118,6 +119,7 @@ function TripNotificationCard({ trip, badge }: { trip: TourPost; badge: { text: 
 
 export default function HomePage() {
   const { user, profile, loading: authLoading } = useAuth();
+  const { colors } = useTheme();
   const [awaitingResponse, setAwaitingResponse] = useState<TourPost[]>([]);
   const [needsAttention, setNeedsAttention] = useState<TourPost[]>([]);
   const [notifications, setNotifications] = useState<UserNotification[]>([]);
@@ -171,13 +173,17 @@ export default function HomePage() {
         {/* Check Forecast CTA */}
         <Link
           href="/forecast"
-          className="block bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl"
+          className="block rounded-2xl p-6 transition-all shadow-lg hover:shadow-xl hover:scale-[1.01]"
+          style={{
+            background: `linear-gradient(to right, ${colors.primary.from}, ${colors.primary.to})`,
+            color: colors.primary.text,
+          }}
         >
           <div className="flex items-center gap-4">
             <div className="text-4xl">🏔️</div>
             <div className="flex-1">
               <h2 className="text-xl font-bold">Check Forecast</h2>
-              <p className="text-blue-100">Avalanche conditions and weather</p>
+              <p style={{ color: colors.primary.subtext }}>Avalanche conditions and weather</p>
             </div>
             <div className="text-2xl">→</div>
           </div>
@@ -186,13 +192,17 @@ export default function HomePage() {
         {/* Find a Trip CTA */}
         <Link
           href="/trips"
-          className="block bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-6 text-white hover:from-green-700 hover:to-green-800 transition-all shadow-lg hover:shadow-xl"
+          className="block rounded-2xl p-6 transition-all shadow-lg hover:shadow-xl hover:scale-[1.01]"
+          style={{
+            background: `linear-gradient(to right, ${colors.secondary.from}, ${colors.secondary.to})`,
+            color: colors.secondary.text,
+          }}
         >
           <div className="flex items-center gap-4">
             <div className="text-4xl">⛷️</div>
             <div className="flex-1">
               <h2 className="text-xl font-bold">Find a Trip</h2>
-              <p className="text-green-100">Browse upcoming adventures</p>
+              <p style={{ color: colors.secondary.subtext }}>Browse upcoming adventures</p>
             </div>
             <div className="text-2xl">→</div>
           </div>
@@ -201,13 +211,17 @@ export default function HomePage() {
         {/* Find Partners CTA */}
         <Link
           href="/partners"
-          className="block bg-gradient-to-r from-purple-600 to-purple-700 rounded-2xl p-6 text-white hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg hover:shadow-xl"
+          className="block rounded-2xl p-6 transition-all shadow-lg hover:shadow-xl hover:scale-[1.01]"
+          style={{
+            background: `linear-gradient(to right, ${colors.tertiary.from}, ${colors.tertiary.to})`,
+            color: colors.tertiary.text,
+          }}
         >
           <div className="flex items-center gap-4">
             <div className="text-4xl">🤝</div>
             <div className="flex-1">
               <h2 className="text-xl font-bold">Find Partners</h2>
-              <p className="text-purple-100">Connect with touring buddies</p>
+              <p style={{ color: colors.tertiary.subtext }}>Connect with touring buddies</p>
             </div>
             <div className="text-2xl">→</div>
           </div>

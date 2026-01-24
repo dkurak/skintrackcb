@@ -741,6 +741,10 @@ export default function AdminPage() {
           <a href="/profile" className="text-blue-600 hover:text-blue-800 text-sm">
             Edit Profile →
           </a>
+          <span className="text-blue-300">|</span>
+          <a href="/admin/branding" className="text-blue-600 hover:text-blue-800 text-sm">
+            Theme & Branding →
+          </a>
         </div>
       </div>
     </div>
