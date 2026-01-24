@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { getUnreadNotificationCount } from '@/lib/partners';
+import { Logo } from './Logo';
 
 const navItems = [
   { href: '/forecast', label: 'Forecast' },
@@ -45,8 +46,8 @@ export function Navigation() {
     <nav className="bg-gray-900 text-white">
       <div className="max-w-4xl mx-auto px-4">
         <div className="flex items-center justify-between h-14">
-          <Link href="/" className="font-bold text-lg">
-            Backcountry Crews
+          <Link href="/" className="flex items-center">
+            <Logo color="white" size={20} />
           </Link>
 
           {/* Desktop nav */}

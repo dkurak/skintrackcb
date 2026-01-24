@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { LogoIcon } from '@/components/Logo';
 
 export default function MaintenancePage() {
   const router = useRouter();
@@ -59,25 +60,13 @@ export default function MaintenancePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
           {/* Logo/Brand */}
           <div className="mb-6">
-            <div className="w-16 h-16 bg-blue-600 rounded-xl mx-auto flex items-center justify-center mb-4">
-              <svg
-                className="w-10 h-10 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 3l14 9-14 9V3z"
-                />
-              </svg>
+            <div className="w-16 h-16 bg-slate-800 rounded-xl mx-auto flex items-center justify-center mb-4">
+              <LogoIcon color="white" size={40} />
             </div>
             <h1 className="text-2xl font-bold text-gray-900">Backcountry Crews</h1>
           </div>
@@ -117,7 +106,7 @@ export default function MaintenancePage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter site password"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 text-center"
               />
             </div>
 
@@ -128,7 +117,7 @@ export default function MaintenancePage() {
             <button
               type="submit"
               disabled={loading || !password}
-              className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full py-3 px-4 bg-slate-800 text-white rounded-lg font-medium hover:bg-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? 'Checking...' : 'Enter Site'}
             </button>
@@ -137,7 +126,7 @@ export default function MaintenancePage() {
           {/* Footer */}
           <p className="mt-6 text-xs text-gray-400">
             Have an account?{' '}
-            <a href="/login" className="text-blue-600 hover:underline">
+            <a href="/login" className="text-slate-600 hover:underline">
               Sign in
             </a>
           </p>
