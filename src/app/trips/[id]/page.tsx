@@ -93,31 +93,31 @@ function InviteSection({ tripSlug, tripTitle, tripDate }: { tripSlug: string; tr
                 : 'bg-teal-600 text-white hover:bg-teal-700'
             }`}
           >
-            {copied ? 'Copied!' : 'Copy Link'}
+            {copied ? 'Copied!' : 'Copy'}
           </button>
         </div>
 
-        {/* Email Invite */}
-        <a
-          href={`mailto:?subject=${emailSubject}&body=${emailBody}`}
-          className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-white border border-teal-300 text-teal-700 rounded-lg text-sm font-medium hover:bg-teal-50 transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-          Send Email Invite
-        </a>
-
-        {/* Share via text */}
-        <a
-          href={`sms:?body=${encodeURIComponent(`Join my trip: ${tripTitle} - ${tripUrl}`)}`}
-          className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-white border border-teal-300 text-teal-700 rounded-lg text-sm font-medium hover:bg-teal-50 transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
-          Send Text Invite
-        </a>
+        {/* Email & Text on same row */}
+        <div className="flex gap-2">
+          <a
+            href={`mailto:?subject=${emailSubject}&body=${emailBody}`}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white border border-teal-300 text-teal-700 rounded-lg text-sm font-medium hover:bg-teal-50 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            Email
+          </a>
+          <a
+            href={`sms:?body=${encodeURIComponent(`Join my trip: ${tripTitle} - ${tripUrl}`)}`}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white border border-teal-300 text-teal-700 rounded-lg text-sm font-medium hover:bg-teal-50 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            Text
+          </a>
+        </div>
       </div>
     </div>
   );
