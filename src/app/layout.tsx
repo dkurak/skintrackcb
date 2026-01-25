@@ -16,8 +16,52 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Backcountry Crews - Find Your Backcountry Partners",
-  description: "Find partners for backcountry skiing, hiking, biking, and more. Connect with local crews in Crested Butte and beyond.",
+  title: {
+    default: 'Backcountry Crews - Find Your Backcountry Partners in Crested Butte',
+    template: '%s | Backcountry Crews',
+  },
+  description: 'Find partners for backcountry skiing, ski touring, hiking, mountain biking, and trail running in Crested Butte, Colorado. Check avalanche forecasts, post trips, and connect with local crews.',
+  keywords: ['backcountry skiing', 'ski touring', 'Crested Butte', 'avalanche forecast', 'CBAC', 'backcountry partners', 'Colorado skiing', 'mountain biking', 'hiking partners'],
+  authors: [{ name: 'Backcountry Crews' }],
+  creator: 'Backcountry Crews',
+  metadataBase: new URL('https://backcountrycrews.com'),
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://backcountrycrews.com',
+    siteName: 'Backcountry Crews',
+    title: 'Backcountry Crews - Find Your Backcountry Partners',
+    description: 'Find partners for backcountry skiing and outdoor adventures in Crested Butte, Colorado. Check forecasts, post trips, connect with crews.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Backcountry Crews - Find Your Backcountry Partners',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Backcountry Crews - Find Your Backcountry Partners',
+    description: 'Find partners for backcountry skiing and outdoor adventures in Crested Butte, Colorado.',
+    images: ['/og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    // Add your Google Search Console verification code here
+    // google: 'your-verification-code',
+  },
 };
 
 export default function RootLayout({
