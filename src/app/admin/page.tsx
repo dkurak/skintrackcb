@@ -93,7 +93,7 @@ export default function AdminPage() {
   const { theme, colors, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<AdminTab>('test-data');
   const [testUsers, setTestUsers] = useState<TestUser[]>([]);
-  const [showAllUsers, setShowAllUsers] = useState(false);
+  const [showTestUsers, setShowTestUsers] = useState(false);
   const [userCounts, setUserCounts] = useState({ total: 0, test: 0, real: 0 });
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(true);
@@ -169,10 +169,10 @@ export default function AdminPage() {
     }
   };
 
-  const fetchTestUsers = async (showAll = showAllUsers) => {
+  const fetchTestUsers = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/test-users${showAll ? '?all=true' : ''}`);
+      const res = await fetch('/api/admin/test-users?all=true');
       const data = await res.json();
       if (data.users) {
         setTestUsers(data.users);
@@ -188,6 +188,9 @@ export default function AdminPage() {
     }
     setLoading(false);
   };
+
+  // Filter users based on toggle
+  const displayedUsers = testUsers.filter(u => showTestUsers ? u.is_test_user : !u.is_test_user);
 
   const fetchFeatureFlags = async () => {
     if (!supabase) return;
@@ -581,76 +584,68 @@ export default function AdminPage() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-lg font-semibold text-gray-900">
-                  {showAllUsers ? 'All Users' : 'Test Users'} ({testUsers.length})
+                  {showTestUsers ? 'Test Users' : 'Users'} ({displayedUsers.length})
                 </h2>
                 {userCounts.total > 0 && (
                   <p className="text-sm text-gray-500">
-                    {userCounts.real} real users, {userCounts.test} test users
+                    {userCounts.real} real, {userCounts.test} test
                   </p>
                 )}
               </div>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <span className="text-sm text-gray-600">Show all users</span>
+              <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
                 <button
-                  onClick={() => {
-                    const newValue = !showAllUsers;
-                    setShowAllUsers(newValue);
-                    fetchTestUsers(newValue);
-                  }}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    showAllUsers ? 'bg-blue-500' : 'bg-gray-300'
+                  onClick={() => setShowTestUsers(false)}
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                    !showTestUsers
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                      showAllUsers ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
+                  Real ({userCounts.real})
                 </button>
-              </label>
+                <button
+                  onClick={() => setShowTestUsers(true)}
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                    showTestUsers
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Test ({userCounts.test})
+                </button>
+              </div>
             </div>
 
             {loading ? (
               <p className="text-gray-500">Loading...</p>
-            ) : testUsers.length === 0 ? (
+            ) : displayedUsers.length === 0 ? (
               <p className="text-gray-500">
-                {showAllUsers ? 'No users found.' : 'No test users created yet. Click the button above to create them.'}
+                {showTestUsers ? 'No test users created yet. Click the button above to create them.' : 'No real users have signed up yet.'}
               </p>
             ) : (
               <div className="space-y-2">
-                {testUsers.map((testUser) => (
+                {displayedUsers.map((displayUser) => (
                   <div
-                    key={testUser.id}
-                    className={`flex items-center justify-between p-3 rounded-lg ${
-                      testUser.is_test_user ? 'bg-amber-50 border border-amber-200' : 'bg-blue-50 border border-blue-200'
-                    }`}
+                    key={displayUser.id}
+                    className="flex items-center justify-between p-3 rounded-lg bg-gray-50"
                   >
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900">
-                          {testUser.display_name || testUser.email}
-                        </span>
-                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                          testUser.is_test_user
-                            ? 'bg-amber-100 text-amber-700'
-                            : 'bg-blue-100 text-blue-700'
-                        }`}>
-                          {testUser.is_test_user ? 'Test' : 'Real'}
-                        </span>
+                      <div className="font-medium text-gray-900">
+                        {displayUser.display_name || displayUser.email}
                       </div>
                       <div className="text-sm text-gray-500 flex flex-wrap gap-2 mt-1">
-                        <span>{testUser.email}</span>
-                        {testUser.experience_level && (
+                        <span>{displayUser.email}</span>
+                        {displayUser.experience_level && (
                           <span className="px-2 py-0.5 bg-gray-200 rounded text-xs">
-                            {EXPERIENCE_LABELS[testUser.experience_level]}
+                            {EXPERIENCE_LABELS[displayUser.experience_level]}
                           </span>
                         )}
-                        {testUser.travel_method && (
+                        {displayUser.travel_method && (
                           <span className="px-2 py-0.5 bg-gray-200 rounded text-xs">
-                            {testUser.travel_method}
+                            {displayUser.travel_method}
                           </span>
                         )}
-                        {testUser.looking_for_partners && (
+                        {displayUser.looking_for_partners && (
                           <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs">
                             Looking for partners
                           </span>
@@ -658,15 +653,15 @@ export default function AdminPage() {
                       </div>
                       <div className="text-xs text-gray-400 mt-1 flex gap-4">
                         <span>
-                          Created: {new Date(testUser.created_at).toLocaleDateString('en-US', {
+                          Created: {new Date(displayUser.created_at).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric',
                             year: 'numeric',
                           })}
                         </span>
                         <span>
-                          Last login: {testUser.last_sign_in_at
-                            ? new Date(testUser.last_sign_in_at).toLocaleDateString('en-US', {
+                          Last login: {displayUser.last_sign_in_at
+                            ? new Date(displayUser.last_sign_in_at).toLocaleDateString('en-US', {
                                 month: 'short',
                                 day: 'numeric',
                                 year: 'numeric',
@@ -677,9 +672,9 @@ export default function AdminPage() {
                         </span>
                       </div>
                     </div>
-                    {testUser.is_test_user && (
+                    {showTestUsers && (
                       <button
-                        onClick={() => handleSignInAs(testUser.email)}
+                        onClick={() => handleSignInAs(displayUser.email)}
                         className="px-3 py-1.5 bg-gray-900 text-white rounded text-sm font-medium hover:bg-gray-800 transition-colors"
                       >
                         Sign in as
