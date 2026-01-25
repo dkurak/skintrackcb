@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth';
 import { createTourPost, ActivityType, ACTIVITY_LABELS, ACTIVITY_ICONS, ACTIVITY_COLORS } from '@/lib/partners';
 import { getTrailheads, Trailhead } from '@/lib/trailheads';
 import { getEnabledActivities } from '@/lib/featureFlags';
+import { getTripPath } from '@/lib/slugify';
 
 const EXPERIENCE_LEVELS = [
   { value: '', label: 'Any level welcome' },
@@ -126,7 +127,7 @@ export default function NewTourPostPage() {
       setError(createError.message);
       setIsSubmitting(false);
     } else if (data) {
-      router.push(`/trips/${data.id}`);
+      router.push(getTripPath(data));
     }
   };
 

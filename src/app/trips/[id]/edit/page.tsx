@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
-import { getTourPost, updateTourPost, ActivityType, ACTIVITY_LABELS, ACTIVITY_ICONS, ACTIVITY_COLORS } from '@/lib/partners';
+import { getTourPost, updateTourPost, TourPost, ActivityType, ACTIVITY_LABELS, ACTIVITY_ICONS, ACTIVITY_COLORS } from '@/lib/partners';
 import { getTrailheads, Trailhead } from '@/lib/trailheads';
+import { parseSlugOrId, getTripPath } from '@/lib/slugify';
 
 const ALL_ACTIVITIES: ActivityType[] = ['ski_tour', 'offroad', 'mountain_bike', 'trail_run', 'hike', 'climb'];
 
@@ -20,9 +21,11 @@ const EXPERIENCE_LEVELS = [
 export default function EditTripPage() {
   const router = useRouter();
   const params = useParams();
-  const tripId = params.id as string;
+  const urlParam = params.id as string;
+  const tripId = parseSlugOrId(urlParam); // Extract ID from slug or use as-is
   const { user, loading: authLoading } = useAuth();
 
+  const [originalTrip, setOriginalTrip] = useState<TourPost | null>(null);
   const [activity, setActivity] = useState<ActivityType>('ski_tour');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -61,6 +64,7 @@ export default function EditTripPage() {
         return;
       }
 
+      setOriginalTrip(trip);
       setOriginalOwnerId(trip.user_id);
       setActivity(trip.activity || 'ski_tour');
       setTitle(trip.title);
@@ -99,10 +103,10 @@ export default function EditTripPage() {
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/login');
-    } else if (!isLoading && originalOwnerId && user && user.id !== originalOwnerId) {
-      router.push(`/trips/${tripId}`);
+    } else if (!isLoading && originalOwnerId && user && user.id !== originalOwnerId && originalTrip) {
+      router.push(getTripPath(originalTrip));
     }
-  }, [authLoading, user, isLoading, originalOwnerId, tripId, router]);
+  }, [authLoading, user, isLoading, originalOwnerId, originalTrip, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,8 +164,8 @@ export default function EditTripPage() {
     if (updateError) {
       setError(updateError.message);
       setIsSubmitting(false);
-    } else {
-      router.push(`/trips/${tripId}`);
+    } else if (originalTrip) {
+      router.push(getTripPath(originalTrip));
     }
   };
 
@@ -183,7 +187,7 @@ export default function EditTripPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Edit Trip</h1>
         <Link
-          href={`/trips/${tripId}`}
+          href={originalTrip ? getTripPath(originalTrip) : '/trips'}
           className="text-sm text-gray-600 hover:text-gray-900"
         >
           Cancel

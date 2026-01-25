@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { generateTripSlug } from './slugify';
 
 // Timeout wrapper to prevent hanging requests
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> {
@@ -45,6 +46,7 @@ export const ACTIVITY_ICONS: Record<ActivityType, string> = {
 export interface TourPost {
   id: string;
   user_id: string;
+  slug: string | null;
   title: string;
   description: string | null;
   tour_date: string;
@@ -343,13 +345,18 @@ export async function getTripsWithPendingRequests(userId: string): Promise<TourP
   return withTimeout(fetchData(), 10000, []);
 }
 
-// Get a single tour post
-export async function getTourPost(id: string): Promise<TourPost | null> {
+// Get a single tour post by ID or short ID
+// Supports both full UUID and short ID (first 8 chars of UUID)
+export async function getTourPost(idOrShortId: string): Promise<TourPost | null> {
   if (!supabase) return null;
   const client = supabase;
 
   const fetchData = async () => {
-    const { data, error } = await client
+    // Check if it's a full UUID
+    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const isFullUuid = uuidPattern.test(idOrShortId);
+
+    let query = client
       .from('tour_posts')
       .select(`
         *,
@@ -358,9 +365,18 @@ export async function getTourPost(id: string): Promise<TourPost | null> {
           experience_level,
           certifications
         )
-      `)
-      .eq('id', id)
-      .single();
+      `);
+
+    if (isFullUuid) {
+      // Full UUID - exact match
+      query = query.eq('id', idOrShortId);
+    } else {
+      // Short ID - match on first 8 characters of ID
+      // Use ilike with the short ID pattern
+      query = query.ilike('id', `${idOrShortId}-%`);
+    }
+
+    const { data, error } = await query.single();
 
     if (error) {
       console.error('Error fetching tour post:', error);
@@ -399,12 +415,13 @@ export async function getMyTourPosts(userId: string): Promise<TourPost[]> {
 // Create a tour post
 export async function createTourPost(
   userId: string,
-  post: Omit<TourPost, 'id' | 'user_id' | 'status' | 'created_at' | 'updated_at' | 'profiles' | 'planning_notes' | 'accepted_count'>
+  post: Omit<TourPost, 'id' | 'user_id' | 'slug' | 'status' | 'created_at' | 'updated_at' | 'profiles' | 'planning_notes' | 'accepted_count'>
 ): Promise<{ data: TourPost | null; error: Error | null }> {
   if (!supabase) {
     return { data: null, error: new Error('Supabase not configured') };
   }
 
+  // First insert without slug to get the ID
   const { data, error } = await supabase
     .from('tour_posts')
     .insert({
@@ -419,7 +436,14 @@ export async function createTourPost(
     return { data: null, error: error as unknown as Error };
   }
 
-  return { data: data as TourPost, error: null };
+  // Generate and save the slug using the new ID
+  const slug = generateTripSlug(post.title, data.id);
+  await supabase
+    .from('tour_posts')
+    .update({ slug })
+    .eq('id', data.id);
+
+  return { data: { ...data, slug } as TourPost, error: null };
 }
 
 // Update a tour post

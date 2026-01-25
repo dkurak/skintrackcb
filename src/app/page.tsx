@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { useTheme } from '@/lib/theme';
 import { AvalancheWarningBanner } from '@/components/AvalancheWarningBanner';
 import { getTripsAwaitingResponse, getTripsWithPendingRequests, getUserNotifications, deleteNotification, TourPost, UserNotification, ACTIVITY_COLORS, ACTIVITY_ICONS } from '@/lib/partners';
+import { getTripPath } from '@/lib/slugify';
 
 function formatTimeAgo(dateString: string): string {
   const date = new Date(dateString);
@@ -78,7 +79,7 @@ function TripNotificationCard({ trip, badge }: { trip: TourPost; badge: { text: 
 
   return (
     <Link
-      href={`/trips/${trip.id}`}
+      href={getTripPath(trip)}
       className="block bg-white rounded-lg border border-gray-200 p-4 hover:border-gray-300 hover:shadow-sm transition-all"
     >
       <div className="flex items-center justify-between gap-3">

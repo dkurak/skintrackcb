@@ -25,6 +25,7 @@ import {
   ACTIVITY_COLORS,
   ACTIVITY_ICONS,
 } from '@/lib/partners';
+import { parseSlugOrId, getTripPath } from '@/lib/slugify';
 
 const EXPERIENCE_LABELS: Record<string, string> = {
   beginner: 'Beginner',
@@ -33,11 +34,11 @@ const EXPERIENCE_LABELS: Record<string, string> = {
   expert: 'Expert',
 };
 
-function InviteSection({ tripId, tripTitle, tripDate }: { tripId: string; tripTitle: string; tripDate: string }) {
+function InviteSection({ tripSlug, tripTitle, tripDate }: { tripSlug: string; tripTitle: string; tripDate: string }) {
   const [copied, setCopied] = useState(false);
   const tripUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/trips/${tripId}`
-    : `https://backcountrycrews.com/trips/${tripId}`;
+    ? `${window.location.origin}/trips/${tripSlug}`
+    : `https://backcountrycrews.com/trips/${tripSlug}`;
 
   const handleCopyLink = async () => {
     try {
@@ -125,7 +126,8 @@ function InviteSection({ tripId, tripTitle, tripDate }: { tripId: string; tripTi
 export default function TourPostPage() {
   const router = useRouter();
   const params = useParams();
-  const postId = params.id as string;
+  const urlParam = params.id as string;
+  const postId = parseSlugOrId(urlParam); // Extract ID from slug or use as-is
   const { user, loading: authLoading } = useAuth();
 
   const [post, setPost] = useState<TourPost | null>(null);
@@ -514,7 +516,7 @@ export default function TourPostPage() {
 
       {/* Invite section (for owner) */}
       {isOwner && !isPast && post.status !== 'completed' && (
-        <InviteSection tripId={postId} tripTitle={post.title} tripDate={post.tour_date} />
+        <InviteSection tripSlug={post.slug || post.id} tripTitle={post.title} tripDate={post.tour_date} />
       )}
 
       {/* You're In! (for accepted participants) */}

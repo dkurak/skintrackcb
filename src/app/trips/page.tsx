@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { getTourPosts, getTripsWithPendingRequests, getUserNotifications, deleteNotification, TourPost, TourFilters, ActivityType, UserNotification, ACTIVITY_LABELS, ACTIVITY_COLORS, ACTIVITY_ICONS } from '@/lib/partners';
 import { getEnabledActivities } from '@/lib/featureFlags';
+import { getTripPath } from '@/lib/slugify';
 
 const EXPERIENCE_LABELS: Record<string, string> = {
   beginner: 'Beginner',
@@ -172,7 +173,7 @@ function TourPostCard({ post, pendingCount }: { post: TourPost; pendingCount?: n
 
   return (
     <Link
-      href={`/trips/${post.id}`}
+      href={getTripPath(post)}
       className="block bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:border-gray-300 hover:shadow-md transition-all"
     >
       <div className="flex items-start justify-between gap-4">

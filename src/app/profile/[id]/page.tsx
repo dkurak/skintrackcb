@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { getTripPath } from '@/lib/slugify';
 
 interface PublicProfile {
   id: string;
@@ -23,6 +24,7 @@ interface PublicProfile {
 
 interface TourSummary {
   id: string;
+  slug: string | null;
   title: string;
   tour_date: string;
   zone: string;
@@ -99,7 +101,7 @@ export default function PublicProfilePage() {
       // Fetch tours they've organized
       const { data: organized } = await supabase
         .from('tour_posts')
-        .select('id, title, tour_date, zone, status')
+        .select('id, slug, title, tour_date, zone, status')
         .eq('user_id', userId)
         .order('tour_date', { ascending: false })
         .limit(10);
@@ -115,6 +117,7 @@ export default function PublicProfilePage() {
           tour_id,
           tour_posts (
             id,
+            slug,
             title,
             tour_date,
             zone,
@@ -131,6 +134,7 @@ export default function PublicProfilePage() {
             const tour = r.tour_posts as unknown as TourSummary;
             return {
               id: tour.id,
+              slug: tour.slug,
               title: tour.title,
               tour_date: tour.tour_date,
               zone: tour.zone,
@@ -296,7 +300,7 @@ export default function PublicProfilePage() {
             {organizedTours.map((tour) => (
               <Link
                 key={tour.id}
-                href={`/trips/${tour.id}`}
+                href={getTripPath(tour)}
                 className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <div className="flex items-center justify-between">
@@ -340,7 +344,7 @@ export default function PublicProfilePage() {
             {joinedTours.map((tour) => (
               <Link
                 key={tour.id}
-                href={`/trips/${tour.id}`}
+                href={getTripPath(tour)}
                 className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <div className="font-medium text-gray-900">{tour.title}</div>
