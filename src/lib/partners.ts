@@ -345,8 +345,8 @@ export async function getTripsWithPendingRequests(userId: string): Promise<TourP
   return withTimeout(fetchData(), 10000, []);
 }
 
-// Get a single tour post by ID or short ID
-// Supports both full UUID and short ID (first 8 chars of UUID)
+// Get a single tour post by ID, short ID, or slug
+// Supports: full UUID, short ID (first 8 chars), or full slug
 export async function getTourPost(idOrShortId: string): Promise<TourPost | null> {
   if (!supabase) return null;
   const client = supabase;
@@ -356,34 +356,55 @@ export async function getTourPost(idOrShortId: string): Promise<TourPost | null>
     const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     const isFullUuid = uuidPattern.test(idOrShortId);
 
-    let query = client
-      .from('tour_posts')
-      .select(`
-        *,
-        profiles (
-          display_name,
-          experience_level,
-          certifications
-        )
-      `);
+    const baseSelect = `
+      *,
+      profiles (
+        display_name,
+        experience_level,
+        certifications
+      )
+    `;
 
     if (isFullUuid) {
-      // Full UUID - exact match
-      query = query.eq('id', idOrShortId);
-    } else {
-      // Short ID - match on first 8 characters of ID
-      // Use ilike with the short ID pattern
-      query = query.ilike('id', `${idOrShortId}-%`);
+      // Full UUID - exact match on id
+      const { data, error } = await client
+        .from('tour_posts')
+        .select(baseSelect)
+        .eq('id', idOrShortId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching tour post by UUID:', error);
+        return null;
+      }
+      return data as TourPost;
     }
 
-    const { data, error } = await query.single();
+    // Not a UUID - try matching by slug (which ends with the short ID)
+    // The slug format is: title-slug-shortid (e.g., "morning-tour-86db9d11")
+    const { data, error } = await client
+      .from('tour_posts')
+      .select(baseSelect)
+      .ilike('slug', `%-${idOrShortId}`)
+      .single();
 
-    if (error) {
-      console.error('Error fetching tour post:', error);
+    if (!error && data) {
+      return data as TourPost;
+    }
+
+    // Fallback: try exact slug match (in case the full slug was passed)
+    const { data: exactMatch, error: exactError } = await client
+      .from('tour_posts')
+      .select(baseSelect)
+      .eq('slug', idOrShortId)
+      .single();
+
+    if (exactError) {
+      console.error('Error fetching tour post:', exactError);
       return null;
     }
 
-    return data as TourPost;
+    return exactMatch as TourPost;
   };
 
   return withTimeout(fetchData(), 10000, null);
