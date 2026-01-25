@@ -33,21 +33,51 @@ const SAMPLE_PROFILES = [
 const TRAILHEADS = ['washington_gulch', 'snodgrass', 'kebler', 'brush_creek', 'cement_creek'];
 const CERTIFICATIONS = [['AIARE 1'], ['AIARE 1', 'WFR'], ['AIARE 2'], ['AIARE 1', 'AIARE 2'], []];
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // Get all test users
-    const { data: profiles, error } = await supabaseAdmin
+    const { searchParams } = new URL(request.url);
+    const showAll = searchParams.get('all') === 'true';
+
+    // Get profiles based on filter
+    let query = supabaseAdmin
       .from('profiles')
       .select('*')
-      .eq('is_test_user', true)
-      .order('display_name');
+      .order('created_at', { ascending: false });
+
+    if (!showAll) {
+      query = query.eq('is_test_user', true);
+    }
+
+    const { data: profiles, error } = await query;
 
     if (error) throw error;
 
-    return NextResponse.json({ users: profiles, password: TEST_USER_PASSWORD });
+    // Get auth user data for last sign in times
+    const { data: authUsers, error: authError } = await supabaseAdmin.auth.admin.listUsers();
+
+    if (authError) {
+      console.error('Error fetching auth users:', authError);
+    }
+
+    // Merge last_sign_in_at into profiles
+    const usersWithAuth = profiles?.map(profile => {
+      const authUser = authUsers?.users?.find(u => u.id === profile.id);
+      return {
+        ...profile,
+        last_sign_in_at: authUser?.last_sign_in_at || null,
+      };
+    }) || [];
+
+    return NextResponse.json({
+      users: usersWithAuth,
+      password: TEST_USER_PASSWORD,
+      totalUsers: usersWithAuth.length,
+      testUsers: usersWithAuth.filter(u => u.is_test_user).length,
+      realUsers: usersWithAuth.filter(u => !u.is_test_user).length,
+    });
   } catch (error) {
-    console.error('Error fetching test users:', error);
-    return NextResponse.json({ error: 'Failed to fetch test users' }, { status: 500 });
+    console.error('Error fetching users:', error);
+    return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
   }
 }
 

@@ -28,6 +28,9 @@ interface TestUser {
   experience_level: string | null;
   travel_method: string | null;
   looking_for_partners: boolean;
+  is_test_user: boolean;
+  created_at: string;
+  last_sign_in_at: string | null;
 }
 
 interface ActivityStats {
@@ -90,6 +93,8 @@ export default function AdminPage() {
   const { theme, colors, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<AdminTab>('test-data');
   const [testUsers, setTestUsers] = useState<TestUser[]>([]);
+  const [showAllUsers, setShowAllUsers] = useState(false);
+  const [userCounts, setUserCounts] = useState({ total: 0, test: 0, real: 0 });
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -164,17 +169,22 @@ export default function AdminPage() {
     }
   };
 
-  const fetchTestUsers = async () => {
+  const fetchTestUsers = async (showAll = showAllUsers) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/test-users');
+      const res = await fetch(`/api/admin/test-users${showAll ? '?all=true' : ''}`);
       const data = await res.json();
       if (data.users) {
         setTestUsers(data.users);
         setPassword(data.password);
+        setUserCounts({
+          total: data.totalUsers || 0,
+          test: data.testUsers || 0,
+          real: data.realUsers || 0,
+        });
       }
     } catch (error) {
-      console.error('Error fetching test users:', error);
+      console.error('Error fetching users:', error);
     }
     setLoading(false);
   };
@@ -566,28 +576,69 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Test Users List */}
+          {/* Users List */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Test Users ({testUsers.length})
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {showAllUsers ? 'All Users' : 'Test Users'} ({testUsers.length})
+                </h2>
+                {userCounts.total > 0 && (
+                  <p className="text-sm text-gray-500">
+                    {userCounts.real} real users, {userCounts.test} test users
+                  </p>
+                )}
+              </div>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <span className="text-sm text-gray-600">Show all users</span>
+                <button
+                  onClick={() => {
+                    const newValue = !showAllUsers;
+                    setShowAllUsers(newValue);
+                    fetchTestUsers(newValue);
+                  }}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    showAllUsers ? 'bg-blue-500' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                      showAllUsers ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </label>
+            </div>
 
             {loading ? (
               <p className="text-gray-500">Loading...</p>
             ) : testUsers.length === 0 ? (
-              <p className="text-gray-500">No test users created yet. Click the button above to create them.</p>
+              <p className="text-gray-500">
+                {showAllUsers ? 'No users found.' : 'No test users created yet. Click the button above to create them.'}
+              </p>
             ) : (
               <div className="space-y-2">
                 {testUsers.map((testUser) => (
                   <div
                     key={testUser.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    className={`flex items-center justify-between p-3 rounded-lg ${
+                      testUser.is_test_user ? 'bg-amber-50 border border-amber-200' : 'bg-blue-50 border border-blue-200'
+                    }`}
                   >
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-gray-900">
-                        {testUser.display_name || testUser.email}
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-gray-900">
+                          {testUser.display_name || testUser.email}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                          testUser.is_test_user
+                            ? 'bg-amber-100 text-amber-700'
+                            : 'bg-blue-100 text-blue-700'
+                        }`}>
+                          {testUser.is_test_user ? 'Test' : 'Real'}
+                        </span>
                       </div>
-                      <div className="text-sm text-gray-500 flex flex-wrap gap-2">
+                      <div className="text-sm text-gray-500 flex flex-wrap gap-2 mt-1">
                         <span>{testUser.email}</span>
                         {testUser.experience_level && (
                           <span className="px-2 py-0.5 bg-gray-200 rounded text-xs">
@@ -605,13 +656,35 @@ export default function AdminPage() {
                           </span>
                         )}
                       </div>
+                      <div className="text-xs text-gray-400 mt-1 flex gap-4">
+                        <span>
+                          Created: {new Date(testUser.created_at).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
+                        </span>
+                        <span>
+                          Last login: {testUser.last_sign_in_at
+                            ? new Date(testUser.last_sign_in_at).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                                hour: 'numeric',
+                                minute: '2-digit',
+                              })
+                            : 'Never'}
+                        </span>
+                      </div>
                     </div>
-                    <button
-                      onClick={() => handleSignInAs(testUser.email)}
-                      className="px-3 py-1.5 bg-gray-900 text-white rounded text-sm font-medium hover:bg-gray-800 transition-colors"
-                    >
-                      Sign in as
-                    </button>
+                    {testUser.is_test_user && (
+                      <button
+                        onClick={() => handleSignInAs(testUser.email)}
+                        className="px-3 py-1.5 bg-gray-900 text-white rounded text-sm font-medium hover:bg-gray-800 transition-colors"
+                      >
+                        Sign in as
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
