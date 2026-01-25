@@ -544,7 +544,7 @@ export default function PartnersPage() {
         </div>
       ) : posts.length === 0 ? (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-          <div className="text-4xl mb-4">{showMyTrips ? '📋' : '🎿'}</div>
+          <div className="text-4xl mb-4">{showMyTrips ? '📋' : '⛷️'}</div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             {showMyTrips
               ? 'No trips yet'
@@ -556,16 +556,17 @@ export default function PartnersPage() {
             {showMyTrips
               ? "You haven't organized or joined any trips yet."
               : timeFrame === 'past'
-              ? 'Check upcoming trips to find partners!'
-              : 'Be the first to post a trip and find partners!'}
+              ? 'Check upcoming trips or post your own!'
+              : 'Post a trip and invite your friends to join!'}
           </p>
           {!showMyTrips && (
             user ? (
               <Link
                 href="/trips/new"
-                className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
               >
-                Post a Trip
+                <span>Post a Trip</span>
+                <span className="text-blue-200">+ Invite Friends</span>
               </Link>
             ) : (
               <Link
@@ -675,10 +676,10 @@ export default function PartnersPage() {
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
         <h3 className="font-semibold text-blue-900 mb-2">How it works</h3>
         <ul className="text-sm text-blue-800 space-y-1">
-          <li>1. Create a profile with your experience and gear</li>
-          <li>2. Post a trip with date, zone, and requirements</li>
-          <li>3. Others can express interest in joining</li>
-          <li>4. Review requests and coordinate directly</li>
+          <li>1. Post a trip with your date, zone, and requirements</li>
+          <li>2. Share the link with friends to invite them</li>
+          <li>3. Accept requests and confirm who&apos;s in</li>
+          <li>4. Coordinate details and get out there!</li>
         </ul>
       </div>
     </div>

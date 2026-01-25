@@ -83,9 +83,12 @@ export default function SignUpPage() {
     <div className="min-h-[60vh] flex items-center justify-center">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-          <h1 className="text-2xl font-bold text-gray-900 text-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
             Create Account
           </h1>
+          <p className="text-gray-500 text-center text-sm mb-6">
+            Post trips. Invite your crew. Get out there.
+          </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (

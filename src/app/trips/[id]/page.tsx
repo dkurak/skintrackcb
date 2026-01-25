@@ -33,6 +33,95 @@ const EXPERIENCE_LABELS: Record<string, string> = {
   expert: 'Expert',
 };
 
+function InviteSection({ tripId, tripTitle, tripDate }: { tripId: string; tripTitle: string; tripDate: string }) {
+  const [copied, setCopied] = useState(false);
+  const tripUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/trips/${tripId}`
+    : `https://backcountrycrews.com/trips/${tripId}`;
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(tripUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback for older browsers
+      const input = document.createElement('input');
+      input.value = tripUrl;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const emailSubject = encodeURIComponent(`Join my trip: ${tripTitle}`);
+  const emailBody = encodeURIComponent(
+    `Hey!\n\nI'm planning a trip and would love for you to join.\n\n` +
+    `${tripTitle}\nDate: ${new Date(tripDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}\n\n` +
+    `Check out the details and let me know if you're in:\n${tripUrl}\n\n` +
+    `See you out there!`
+  );
+
+  return (
+    <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-xl p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <span className="text-2xl">📨</span>
+        <h2 className="text-lg font-semibold text-teal-900">Invite Your Crew</h2>
+      </div>
+      <p className="text-teal-700 text-sm mb-4">
+        Share this trip with friends to get your crew together.
+      </p>
+
+      <div className="space-y-3">
+        {/* Copy Link Button */}
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={tripUrl}
+            readOnly
+            className="flex-1 px-3 py-2 bg-white border border-teal-200 rounded-lg text-sm text-gray-600 truncate"
+          />
+          <button
+            onClick={handleCopyLink}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              copied
+                ? 'bg-green-100 text-green-700'
+                : 'bg-teal-600 text-white hover:bg-teal-700'
+            }`}
+          >
+            {copied ? 'Copied!' : 'Copy Link'}
+          </button>
+        </div>
+
+        {/* Email Invite */}
+        <a
+          href={`mailto:?subject=${emailSubject}&body=${emailBody}`}
+          className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-white border border-teal-300 text-teal-700 rounded-lg text-sm font-medium hover:bg-teal-50 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          Send Email Invite
+        </a>
+
+        {/* Share via text */}
+        <a
+          href={`sms:?body=${encodeURIComponent(`Join my trip: ${tripTitle} - ${tripUrl}`)}`}
+          className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-white border border-teal-300 text-teal-700 rounded-lg text-sm font-medium hover:bg-teal-50 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          Send Text Invite
+        </a>
+      </div>
+    </div>
+  );
+}
+
 export default function TourPostPage() {
   const router = useRouter();
   const params = useParams();
@@ -422,6 +511,11 @@ export default function TourPostPage() {
           </div>
         )}
       </div>
+
+      {/* Invite section (for owner) */}
+      {isOwner && !isPast && post.status !== 'completed' && (
+        <InviteSection tripId={postId} tripTitle={post.title} tripDate={post.tour_date} />
+      )}
 
       {/* You're In! (for accepted participants) */}
       {!isOwner && isAccepted && (

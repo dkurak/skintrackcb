@@ -167,7 +167,7 @@ export default function HomePage() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Welcome to Backcountry Crews
             </h1>
-            <p className="text-gray-500">Find your crew for backcountry adventures</p>
+            <p className="text-gray-500">Plan your trip. Invite your crew. Get out there.</p>
           </>
         )}
       </div>
@@ -193,9 +193,9 @@ export default function HomePage() {
           </div>
         </Link>
 
-        {/* Find a Trip CTA */}
+        {/* Post a Trip CTA - Primary action */}
         <Link
-          href="/trips"
+          href={user ? "/trips/new" : "/login"}
           className="block rounded-2xl p-6 transition-all shadow-lg hover:shadow-xl hover:scale-[1.01]"
           style={{
             background: `linear-gradient(to right, ${colors.secondary.from}, ${colors.secondary.to})`,
@@ -205,16 +205,16 @@ export default function HomePage() {
           <div className="flex items-center gap-4">
             <div className="text-4xl">⛷️</div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold">Find a Trip</h2>
-              <p style={{ color: colors.secondary.subtext }}>Browse upcoming adventures</p>
+              <h2 className="text-xl font-bold">Post a Trip</h2>
+              <p style={{ color: colors.secondary.subtext }}>Plan your adventure and invite your crew</p>
             </div>
             <div className="text-2xl">→</div>
           </div>
         </Link>
 
-        {/* Find Partners CTA */}
+        {/* Browse Trips CTA */}
         <Link
-          href="/partners"
+          href="/trips"
           className="block rounded-2xl p-6 transition-all shadow-lg hover:shadow-xl hover:scale-[1.01]"
           style={{
             background: `linear-gradient(to right, ${colors.tertiary.from}, ${colors.tertiary.to})`,
@@ -222,10 +222,10 @@ export default function HomePage() {
           }}
         >
           <div className="flex items-center gap-4">
-            <div className="text-4xl">🤝</div>
+            <div className="text-4xl">🗓️</div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold">Find Partners</h2>
-              <p style={{ color: colors.tertiary.subtext }}>Connect with touring buddies</p>
+              <h2 className="text-xl font-bold">Browse Trips</h2>
+              <p style={{ color: colors.tertiary.subtext }}>Find upcoming adventures near you</p>
             </div>
             <div className="text-2xl">→</div>
           </div>
@@ -324,9 +324,9 @@ export default function HomePage() {
       {/* Sign in prompt for non-logged-in users */}
       {!authLoading && !user && (
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 text-center">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Join the community</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Ready to get out there?</h3>
           <p className="text-gray-500 mb-4">
-            Sign up to create trips, find partners, and coordinate adventures.
+            Sign up to post trips and invite your friends to join your adventures.
           </p>
           <div className="flex justify-center gap-3">
             <Link

@@ -223,16 +223,38 @@ export default function PartnersPage() {
             href="/trips/new"
             className="inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
           >
-            + Create a Trip
+            + Post a Trip
           </Link>
         ) : (
           <Link
             href="/login"
             className="inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
           >
-            Sign in to Create Trip
+            Sign in to Post Trip
           </Link>
         )}
+      </div>
+
+      {/* Invite a Friend CTA */}
+      <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-xl p-5">
+        <div className="flex items-start gap-4">
+          <span className="text-3xl">📨</span>
+          <div className="flex-1">
+            <h3 className="font-semibold text-teal-900 mb-1">Already have a crew in mind?</h3>
+            <p className="text-sm text-teal-700 mb-3">
+              Post a trip and share the link directly with your friends. No need to wait for them to sign up first.
+            </p>
+            <Link
+              href={user ? "/trips/new" : "/login"}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors"
+            >
+              Post a Trip &amp; Invite Friends
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </Link>
+          </div>
+        </div>
       </div>
 
       {/* Zone filter */}
@@ -314,9 +336,9 @@ export default function PartnersPage() {
 
       {/* Info card */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-        <h3 className="font-semibold text-blue-900 mb-2">Looking for partners?</h3>
+        <h3 className="font-semibold text-blue-900 mb-2">Want to be listed here?</h3>
         <p className="text-sm text-blue-800 mb-3">
-          Enable &quot;Looking for partners&quot; in your profile to appear here and let others find you.
+          Enable &quot;Looking for partners&quot; in your profile to let others find you for trips.
         </p>
         <Link
           href="/profile"
