@@ -453,6 +453,15 @@ export default function AdminPage() {
     climb: 'bg-rose-200 text-rose-800',
   };
 
+  const ACTIVITY_ICONS: Record<string, string> = {
+    ski_tour: '⛷️',
+    offroad: '🛻',
+    mountain_bike: '🚵',
+    trail_run: '🏃',
+    hike: '🥾',
+    climb: '🧗',
+  };
+
   const tabs: { id: AdminTab; label: string; icon: string }[] = [
     { id: 'test-data', label: 'Test Data', icon: '🧪' },
     { id: 'settings', label: 'Site Settings', icon: '⚙️' },
@@ -566,8 +575,9 @@ export default function AdminPage() {
                     key={stat.activity}
                     className={`p-3 rounded-lg ${ACTIVITY_COLORS[stat.activity] || 'bg-gray-100 text-gray-700'}`}
                   >
-                    <div className="font-medium text-sm">
-                      {ACTIVITY_LABELS[stat.activity] || stat.activity}
+                    <div className="flex items-center gap-1.5 font-medium text-sm">
+                      <span>{ACTIVITY_ICONS[stat.activity] || '📋'}</span>
+                      <span>{ACTIVITY_LABELS[stat.activity] || stat.activity}</span>
                     </div>
                     <div className="text-2xl font-bold">{stat.total_trips}</div>
                     <div className="text-xs opacity-75">

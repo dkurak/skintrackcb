@@ -558,7 +558,10 @@ export default function PartnersPage() {
                       : `${ACTIVITY_COLORS[activity]} opacity-70 hover:opacity-100`
                   }`}
                 >
-                  <div className="text-xs font-medium">{ACTIVITY_LABELS[activity]}</div>
+                  <div className="flex items-center gap-1 text-xs font-medium">
+                    <span>{ACTIVITY_ICONS[activity]}</span>
+                    <span>{ACTIVITY_LABELS[activity]}</span>
+                  </div>
                   <div className="text-lg font-bold">{count}</div>
                 </button>
               );
