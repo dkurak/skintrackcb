@@ -118,13 +118,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     let mounted = true;
 
-    // Timeout to prevent infinite loading
+    // Timeout to prevent infinite loading - increased to 15 seconds
+    // Hard refresh can cause Supabase to take longer to reconnect
     const timeout = setTimeout(() => {
       if (mounted && loading) {
-        console.warn('Auth initialization timed out');
+        console.warn('Auth initialization timed out after 15s');
         setLoading(false);
       }
-    }, 5000);
+    }, 15000);
 
     // Get initial session
     supabase.auth.getSession()

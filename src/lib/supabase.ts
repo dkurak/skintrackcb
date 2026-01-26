@@ -23,7 +23,12 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: 
   try {
     return await Promise.race([promise, timeout]);
   } catch (error) {
-    console.warn('Request timed out or failed:', error);
+    // Only log if it's actually a timeout, not other errors
+    if (error instanceof Error && error.message === 'Request timed out') {
+      console.warn('Supabase request timed out after', timeoutMs, 'ms');
+    } else {
+      console.warn('Supabase request failed:', error);
+    }
     return fallback;
   }
 }
@@ -112,7 +117,7 @@ export async function getForecasts(zoneId?: string, limit = 14) {
     return data as (DBForecast & { avalanche_problems: DBAvalancheProblem[] })[]
   }
 
-  return withTimeout(fetchData(), 10000, [])
+  return withTimeout(fetchData(), 20000, [])
 }
 
 // Fetch latest forecast for a zone
@@ -140,7 +145,7 @@ export async function getLatestForecast(zoneId: string) {
     return data as DBForecast & { avalanche_problems: DBAvalancheProblem[] }
   }
 
-  return withTimeout(fetchData(), 10000, null)
+  return withTimeout(fetchData(), 20000, null)
 }
 
 // Fetch weather for a zone
@@ -163,7 +168,7 @@ export async function getWeather(zoneId: string, limit = 30) {
     return data as DBWeatherForecast[]
   }
 
-  return withTimeout(fetchData(), 10000, [])
+  return withTimeout(fetchData(), 20000, [])
 }
 
 // Fetch forecasts with weather data merged
@@ -226,5 +231,5 @@ export async function getForecastsWithWeather(zoneId?: string, limit = 30) {
     }
   }
 
-  return withTimeout(fetchData(), 10000, emptyResult)
+  return withTimeout(fetchData(), 20000, emptyResult)
 }
