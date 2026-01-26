@@ -57,7 +57,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Fetch user profile
   const fetchProfile = async (userId: string) => {
-    if (!supabase) return null;
+    if (!supabase) {
+      console.error('fetchProfile: supabase client is null');
+      return null;
+    }
+
+    console.log('fetchProfile: fetching for userId:', userId);
 
     const { data, error } = await supabase
       .from('profiles')
@@ -67,9 +72,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (error) {
       console.error('Error fetching profile:', error);
+      console.error('Error details:', { code: error.code, message: error.message, details: error.details });
+
+      // Check if this is an auth error - token might be invalid
+      if (error.code === 'PGRST301' || error.message?.includes('JWT')) {
+        console.error('Auth token may be invalid, attempting to refresh session...');
+        const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError) {
+          console.error('Failed to refresh session:', refreshError);
+        } else if (refreshData.session) {
+          console.log('Session refreshed, retrying profile fetch...');
+          // Retry the fetch
+          const { data: retryData, error: retryError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .single();
+          if (!retryError) {
+            return retryData as Profile;
+          }
+          console.error('Retry also failed:', retryError);
+        }
+      }
       return null;
     }
 
+    console.log('fetchProfile: got profile data:', data?.display_name);
     return data as Profile;
   };
 
