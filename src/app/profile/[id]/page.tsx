@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { getTripPath } from '@/lib/slugify';
+import { Avatar } from '@/components/Avatar';
+import { EXPERIENCE_LABELS, FITNESS_LABELS, TRAILHEAD_LABELS } from '@/lib/constants';
 
 interface PublicProfile {
   id: string;
@@ -31,29 +33,6 @@ interface TourSummary {
   zone: string;
   status: string;
 }
-
-const EXPERIENCE_LABELS: Record<string, string> = {
-  beginner: 'Beginner',
-  intermediate: 'Intermediate',
-  advanced: 'Advanced',
-  expert: 'Expert',
-};
-
-const FITNESS_LABELS: Record<string, string> = {
-  moderate: 'Moderate',
-  fit: 'Fit',
-  very_fit: 'Very Fit',
-  athlete: 'Athlete',
-};
-
-const TRAILHEAD_LABELS: Record<string, string> = {
-  washington_gulch: 'Washington Gulch',
-  snodgrass: 'Snodgrass',
-  kebler: 'Kebler Pass',
-  brush_creek: 'Brush Creek',
-  cement_creek: 'Cement Creek',
-  slate_river: 'Slate River',
-};
 
 export default function PublicProfilePage() {
   const params = useParams();
@@ -189,17 +168,11 @@ export default function PublicProfilePage() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-start gap-4 mb-4">
           {/* Avatar */}
-          {profile.avatar_url ? (
-            <img
-              src={profile.avatar_url}
-              alt={profile.display_name || 'Profile'}
-              className="w-20 h-20 rounded-full object-cover flex-shrink-0"
-            />
-          ) : (
-            <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-2xl font-bold text-gray-500 flex-shrink-0">
-              {(profile.display_name || '?')[0].toUpperCase()}
-            </div>
-          )}
+          <Avatar
+            src={profile.avatar_url}
+            name={profile.display_name}
+            size="2xl"
+          />
           <div className="flex-1 flex items-start justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">

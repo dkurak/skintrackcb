@@ -4,70 +4,14 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { getPartnersLooking } from '@/lib/partners';
-
-type ExperienceLevel = 'beginner' | 'intermediate' | 'advanced' | 'expert';
-
-const EXPERIENCE_LABELS: Record<ExperienceLevel, string> = {
-  beginner: 'Beginner',
-  intermediate: 'Intermediate',
-  advanced: 'Advanced',
-  expert: 'Expert',
-};
-
-const EXPERIENCE_COLORS: Record<ExperienceLevel, string> = {
-  beginner: 'bg-green-100 text-green-700',
-  intermediate: 'bg-blue-100 text-blue-700',
-  advanced: 'bg-gray-900 text-white',
-  expert: 'bg-gray-900 text-white',
-};
-
-// Ski trail difficulty icons
-function ExperienceIcon({ level, size = 'sm' }: { level: ExperienceLevel; size?: 'sm' | 'lg' }) {
-  const sizeClass = size === 'lg' ? 'w-5 h-5' : 'w-4 h-4';
-
-  switch (level) {
-    case 'beginner':
-      // Green circle
-      return (
-        <svg className={sizeClass} viewBox="0 0 24 24" fill="currentColor">
-          <circle cx="12" cy="12" r="10" className="text-green-500" />
-        </svg>
-      );
-    case 'intermediate':
-      // Blue square
-      return (
-        <svg className={sizeClass} viewBox="0 0 24 24" fill="currentColor">
-          <rect x="2" y="2" width="20" height="20" className="text-blue-500" />
-        </svg>
-      );
-    case 'advanced':
-      // Black diamond (white fill for visibility on dark bg)
-      return (
-        <svg className={sizeClass} viewBox="0 0 24 24" fill="white">
-          <path d="M12 2L22 12L12 22L2 12L12 2Z" />
-        </svg>
-      );
-    case 'expert':
-      // Double black diamond (two side-by-side diamonds)
-      return (
-        <span className="inline-flex gap-0.5">
-          <svg className={sizeClass} viewBox="0 0 24 24" fill="white">
-            <path d="M12 2L22 12L12 22L2 12L12 2Z" />
-          </svg>
-          <svg className={sizeClass} viewBox="0 0 24 24" fill="white">
-            <path d="M12 2L22 12L12 22L2 12L12 2Z" />
-          </svg>
-        </span>
-      );
-  }
-}
-
-const FITNESS_LABELS: Record<string, string> = {
-  moderate: 'Moderate',
-  fit: 'Fit',
-  very_fit: 'Very Fit',
-  athlete: 'Athlete',
-};
+import { ExperienceIcon } from '@/components/ExperienceIcon';
+import { Avatar } from '@/components/Avatar';
+import {
+  ExperienceLevel,
+  EXPERIENCE_LABELS,
+  EXPERIENCE_COLORS,
+  FITNESS_LABELS,
+} from '@/lib/constants';
 
 const ALL_EXPERIENCE_LEVELS: ExperienceLevel[] = ['beginner', 'intermediate', 'advanced', 'expert'];
 
@@ -95,18 +39,7 @@ function PartnerCard({ partner }: { partner: Partner }) {
       className="block bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:border-gray-300 hover:shadow-md transition-all"
     >
       <div className="flex items-start gap-4">
-        {/* Avatar */}
-        {partner.avatar_url ? (
-          <img
-            src={partner.avatar_url}
-            alt={partner.display_name || 'Partner'}
-            className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-          />
-        ) : (
-          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-lg font-bold text-gray-500 flex-shrink-0">
-            {(partner.display_name || '?')[0].toUpperCase()}
-          </div>
-        )}
+        <Avatar src={partner.avatar_url} name={partner.display_name} size="lg" />
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">

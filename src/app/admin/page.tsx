@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import { clearFeatureFlagCache } from '@/lib/featureFlags';
 import { useTheme, themes, ThemeName } from '@/lib/theme';
+import { EXPERIENCE_LABELS } from '@/lib/constants';
 
 interface FeatureFlag {
   key: string;
@@ -426,13 +427,6 @@ export default function AdminPage() {
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to sign in as test user' });
     }
-  };
-
-  const EXPERIENCE_LABELS: Record<string, string> = {
-    beginner: 'Beginner',
-    intermediate: 'Intermediate',
-    advanced: 'Advanced',
-    expert: 'Expert',
   };
 
   const ACTIVITY_LABELS: Record<string, string> = {

@@ -26,13 +26,8 @@ import {
   ACTIVITY_ICONS,
 } from '@/lib/partners';
 import { parseSlugOrId, getTripPath } from '@/lib/slugify';
-
-const EXPERIENCE_LABELS: Record<string, string> = {
-  beginner: 'Beginner',
-  intermediate: 'Intermediate',
-  advanced: 'Advanced',
-  expert: 'Expert',
-};
+import { ExperienceIcon } from '@/components/ExperienceIcon';
+import { ExperienceLevel, EXPERIENCE_LABELS } from '@/lib/constants';
 
 function InviteSection({ tripSlug, tripTitle, tripDate }: { tripSlug: string; tripTitle: string; tripDate: string }) {
   const [copied, setCopied] = useState(false);
@@ -444,6 +439,11 @@ export default function TourPostPage() {
                 <span className="text-sm font-medium text-purple-800">
                   {post.profiles?.display_name || 'Anonymous'}
                 </span>
+                {post.profiles?.experience_level && (
+                  <span className="flex items-center justify-center w-5 h-5 bg-purple-100 rounded">
+                    <ExperienceIcon level={post.profiles.experience_level as ExperienceLevel} size="sm" />
+                  </span>
+                )}
                 <span className="text-xs bg-purple-200 text-purple-700 px-1.5 py-0.5 rounded">
                   Organizer
                 </span>
@@ -470,8 +470,8 @@ export default function TourPostPage() {
                     {participant.display_name || 'Anonymous'}
                   </span>
                   {participant.experience_level && (
-                    <span className="text-xs text-green-600">
-                      ({EXPERIENCE_LABELS[participant.experience_level]})
+                    <span className="flex items-center justify-center w-5 h-5 bg-green-100 rounded">
+                      <ExperienceIcon level={participant.experience_level as ExperienceLevel} size="sm" />
                     </span>
                   )}
                 </Link>

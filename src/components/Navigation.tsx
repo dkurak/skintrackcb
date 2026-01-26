@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { getUnreadNotificationCount } from '@/lib/partners';
 import { Logo } from './Logo';
+import { Avatar } from './Avatar';
 
 const navItems = [
   { href: '/forecast', label: 'Forecast' },
@@ -110,17 +111,11 @@ export function Navigation() {
                   }`}
                   title="Your account"
                 >
-                  {profile?.avatar_url ? (
-                    <img
-                      src={profile.avatar_url}
-                      alt=""
-                      className="w-6 h-6 rounded-full object-cover"
-                    />
-                  ) : (
-                    <span className="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs font-bold">
-                      {(profile?.display_name || user.email || '?')[0].toUpperCase()}
-                    </span>
-                  )}
+                  <Avatar
+                    src={profile?.avatar_url}
+                    name={profile?.display_name || user.email}
+                    size="xs"
+                  />
                   {profile?.display_name || 'Account'}
                 </Link>
               ) : (
@@ -214,17 +209,11 @@ export function Navigation() {
                       : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                   }`}
                 >
-                  {profile?.avatar_url ? (
-                    <img
-                      src={profile.avatar_url}
-                      alt=""
-                      className="w-6 h-6 rounded-full object-cover"
-                    />
-                  ) : (
-                    <span className="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-xs font-bold">
-                      {(profile?.display_name || user.email || '?')[0].toUpperCase()}
-                    </span>
-                  )}
+                  <Avatar
+                    src={profile?.avatar_url}
+                    name={profile?.display_name || user.email}
+                    size="xs"
+                  />
                   {profile?.display_name || 'My Account'}
                 </Link>
               ) : (

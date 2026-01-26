@@ -6,13 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { getTourPosts, getTripsWithPendingRequests, getUserNotifications, deleteNotification, getJoinedTripIds, TourPost, TourFilters, ActivityType, UserNotification, ACTIVITY_LABELS, ACTIVITY_COLORS, ACTIVITY_ICONS } from '@/lib/partners';
 import { getEnabledActivities } from '@/lib/featureFlags';
 import { getTripPath } from '@/lib/slugify';
-
-const EXPERIENCE_LABELS: Record<string, string> = {
-  beginner: 'Beginner',
-  intermediate: 'Intermediate',
-  advanced: 'Advanced',
-  expert: 'Expert',
-};
+import { EXPERIENCE_LABELS } from '@/lib/constants';
 
 // Get the Monday of a week for a given date
 function getWeekStart(date: Date): Date {
