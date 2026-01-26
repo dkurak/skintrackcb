@@ -184,9 +184,25 @@ export default function ProfilePage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Your Profile</h1>
-          <p className="text-gray-500">{user.email}</p>
+        <div className="flex items-center gap-4">
+          {/* Avatar */}
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={displayName || 'Your profile'}
+              className="w-16 h-16 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-xl font-bold text-gray-500">
+              {(displayName || user.email || '?')[0].toUpperCase()}
+            </div>
+          )}
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {displayName || 'Your Profile'}
+            </h1>
+            <p className="text-gray-500">{user.email}</p>
+          </div>
         </div>
         <button
           onClick={handleSignOut}

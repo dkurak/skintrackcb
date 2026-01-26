@@ -334,12 +334,22 @@ export default function TourPostPage() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
-            <div className="flex items-center gap-3 mb-1">
+            <div className="flex items-center gap-3 mb-1 flex-wrap">
               <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-sm font-medium ${ACTIVITY_COLORS[post.activity || 'ski_tour']}`}>
                 <span>{ACTIVITY_ICONS[post.activity || 'ski_tour']}</span>
                 {ACTIVITY_LABELS[post.activity || 'ski_tour']}
               </span>
               <h1 className="text-2xl font-bold text-gray-900">{post.title}</h1>
+              {isOwner && (
+                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                  Organizer
+                </span>
+              )}
+              {!isOwner && isAccepted && (
+                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                  Joined
+                </span>
+              )}
             </div>
             <p className="text-gray-500 mt-1">
               Posted by{' '}
@@ -406,12 +416,36 @@ export default function TourPostPage() {
         </div>
 
         {/* Who's Going (visible to logged-in users) */}
-        {user && participants.length > 0 && (
+        {user && (
           <div className="py-4 border-t border-gray-200">
             <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
-              Who&apos;s Going ({participants.length})
+              Who&apos;s Going ({participants.length + 1})
             </h2>
             <div className="flex flex-wrap gap-2">
+              {/* Organizer */}
+              <Link
+                href={`/profile/${post.user_id}`}
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-50 border border-purple-200 rounded-full hover:bg-purple-100 transition-colors"
+              >
+                {post.profiles?.avatar_url ? (
+                  <img
+                    src={post.profiles.avatar_url}
+                    alt={post.profiles.display_name || 'Organizer'}
+                    className="w-6 h-6 rounded-full object-cover"
+                  />
+                ) : (
+                  <span className="w-6 h-6 rounded-full bg-purple-200 flex items-center justify-center text-xs font-bold text-purple-700">
+                    {(post.profiles?.display_name || '?')[0].toUpperCase()}
+                  </span>
+                )}
+                <span className="text-sm font-medium text-purple-800">
+                  {post.profiles?.display_name || 'Anonymous'}
+                </span>
+                <span className="text-xs bg-purple-200 text-purple-700 px-1.5 py-0.5 rounded">
+                  Organizer
+                </span>
+              </Link>
+              {/* Accepted participants */}
               {participants.map((participant) => (
                 <Link
                   key={participant.user_id}

@@ -68,6 +68,7 @@ export interface TourPost {
   // Joined profile data
   profiles?: {
     display_name: string | null;
+    avatar_url: string | null;
     experience_level: string | null;
     certifications: string[] | null;
   };
@@ -157,6 +158,7 @@ export async function getTourPosts(filters: TourFilters = {}): Promise<TourPost[
         *,
         profiles (
           display_name,
+          avatar_url,
           experience_level,
           certifications
         )
@@ -265,6 +267,7 @@ export async function getTripsAwaitingResponse(userId: string): Promise<TourPost
         *,
         profiles (
           display_name,
+          avatar_url,
           experience_level,
           certifications
         )
@@ -300,6 +303,7 @@ export async function getTripsWithPendingRequests(userId: string): Promise<TourP
         *,
         profiles (
           display_name,
+          avatar_url,
           experience_level,
           certifications
         )

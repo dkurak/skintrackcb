@@ -9,6 +9,7 @@ import { getTripPath } from '@/lib/slugify';
 interface PublicProfile {
   id: string;
   display_name: string | null;
+  avatar_url: string | null;
   bio: string | null;
   experience_level: string | null;
   years_experience: number | null;
@@ -75,6 +76,7 @@ export default function PublicProfilePage() {
         .select(`
           id,
           display_name,
+          avatar_url,
           bio,
           experience_level,
           years_experience,
@@ -185,29 +187,43 @@ export default function PublicProfilePage() {
 
       {/* Profile header */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="flex items-start justify-between gap-4 mb-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {profile.display_name || 'Anonymous'}
-            </h1>
-            <div className="flex flex-wrap items-center gap-2 mt-1">
-              {profile.experience_level && (
-                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">
-                  {EXPERIENCE_LABELS[profile.experience_level]}
-                </span>
-              )}
-              {profile.years_experience !== null && profile.years_experience > 0 && (
-                <span className="text-gray-500 text-sm">
-                  {profile.years_experience} years experience
-                </span>
-              )}
-            </div>
-          </div>
-          {hasGear && (
-            <div className="flex-shrink-0 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-              Avy Gear Ready
+        <div className="flex items-start gap-4 mb-4">
+          {/* Avatar */}
+          {profile.avatar_url ? (
+            <img
+              src={profile.avatar_url}
+              alt={profile.display_name || 'Profile'}
+              className="w-20 h-20 rounded-full object-cover flex-shrink-0"
+            />
+          ) : (
+            <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-2xl font-bold text-gray-500 flex-shrink-0">
+              {(profile.display_name || '?')[0].toUpperCase()}
             </div>
           )}
+          <div className="flex-1 flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                {profile.display_name || 'Anonymous'}
+              </h1>
+              <div className="flex flex-wrap items-center gap-2 mt-1">
+                {profile.experience_level && (
+                  <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">
+                    {EXPERIENCE_LABELS[profile.experience_level]}
+                  </span>
+                )}
+                {profile.years_experience !== null && profile.years_experience > 0 && (
+                  <span className="text-gray-500 text-sm">
+                    {profile.years_experience} years experience
+                  </span>
+                )}
+              </div>
+            </div>
+            {hasGear && (
+              <div className="flex-shrink-0 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                Avy Gear Ready
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Bio */}
