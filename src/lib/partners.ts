@@ -626,10 +626,10 @@ export async function updateTourResponseStatus(
     return { error: new Error('Supabase not configured') };
   }
 
-  // First get the response to find the user and tour
+  // First get the response to find the user, tour, and CURRENT status
   const { data: response, error: fetchError } = await supabase
     .from('tour_responses')
-    .select('user_id, tour_id')
+    .select('user_id, tour_id, status')
     .eq('id', responseId)
     .single();
 
@@ -637,7 +637,9 @@ export async function updateTourResponseStatus(
     return { error: fetchError as unknown as Error };
   }
 
-  // Update the status
+  const previousStatus = response.status;
+
+  // Update the response status
   const { error } = await supabase
     .from('tour_responses')
     .update({ status })
@@ -647,16 +649,43 @@ export async function updateTourResponseStatus(
     return { error: error as unknown as Error };
   }
 
-  // If accepted, create a notification for the user
-  if (status === 'accepted') {
-    // Get trip details for the notification message
-    const { data: trip } = await supabase
-      .from('tour_posts')
-      .select('title')
-      .eq('id', response.tour_id)
-      .single();
+  // Get current trip details
+  const { data: trip } = await supabase
+    .from('tour_posts')
+    .select('title, spots_available, status')
+    .eq('id', response.tour_id)
+    .single();
 
-    if (trip) {
+  if (trip) {
+    // Update spots_available based on status transition
+    if (status === 'accepted' && previousStatus !== 'accepted') {
+      // Accepting someone: decrement spots
+      const newSpotsAvailable = Math.max(0, trip.spots_available - 1);
+      const newTripStatus = newSpotsAvailable === 0 ? 'full' : trip.status;
+
+      await supabase
+        .from('tour_posts')
+        .update({
+          spots_available: newSpotsAvailable,
+          status: newTripStatus === 'open' || newTripStatus === 'full' ? newTripStatus : trip.status
+        })
+        .eq('id', response.tour_id);
+    } else if (status === 'declined' && previousStatus === 'accepted') {
+      // Declining a previously accepted person: increment spots
+      const newSpotsAvailable = trip.spots_available + 1;
+      const newTripStatus = trip.status === 'full' ? 'open' : trip.status;
+
+      await supabase
+        .from('tour_posts')
+        .update({
+          spots_available: newSpotsAvailable,
+          status: newTripStatus
+        })
+        .eq('id', response.tour_id);
+    }
+
+    // Create notification for accepted users
+    if (status === 'accepted') {
       await supabase.from('notifications').insert({
         user_id: response.user_id,
         type: 'trip_accepted',
