@@ -16,6 +16,9 @@ interface Profile {
   has_beacon: boolean;
   has_probe: boolean;
   has_shovel: boolean;
+  has_radio: boolean;
+  has_satellite: boolean;
+  has_first_aid: boolean;
   additional_gear: string[] | null;
   preferred_zones: string[];
   typical_start_time: string | null;

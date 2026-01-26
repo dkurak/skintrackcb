@@ -97,6 +97,13 @@ _Features prioritized for upcoming work_
   - See patterns: which zones, conditions, partners
   - Tie to forecast conditions for that day
 
+- [ ] **Trip Gear Checklist**
+  - Personalized gear checklists for confirmed trips
+  - Participants can check off items they're bringing
+  - Example items: emergency blanket, tarp, extra layers, headlamp, repair kit
+  - Could be per-trip or reusable user template
+  - Consider shared checklist so group can coordinate who's bringing what
+
 ### Content
 
 - [ ] **Radio Channel Guide**

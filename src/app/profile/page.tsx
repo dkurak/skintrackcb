@@ -63,6 +63,9 @@ export default function ProfilePage() {
   const [hasBeacon, setHasBeacon] = useState(false);
   const [hasProbe, setHasProbe] = useState(false);
   const [hasShovel, setHasShovel] = useState(false);
+  const [hasRadio, setHasRadio] = useState(false);
+  const [hasSatellite, setHasSatellite] = useState(false);
+  const [hasFirstAid, setHasFirstAid] = useState(false);
   const [fitnessLevel, setFitnessLevel] = useState('');
   const [typicalStartTime, setTypicalStartTime] = useState('');
   const [preferredZones, setPreferredZones] = useState<string[]>(['southeast', 'northwest']);
@@ -92,6 +95,9 @@ export default function ProfilePage() {
       setHasBeacon(profile.has_beacon || false);
       setHasProbe(profile.has_probe || false);
       setHasShovel(profile.has_shovel || false);
+      setHasRadio(profile.has_radio || false);
+      setHasSatellite(profile.has_satellite || false);
+      setHasFirstAid(profile.has_first_aid || false);
       setFitnessLevel(profile.fitness_level || '');
       setTypicalStartTime(profile.typical_start_time || '');
       setPreferredZones(profile.preferred_zones || ['southeast', 'northwest']);
@@ -142,6 +148,9 @@ export default function ProfilePage() {
       has_beacon: hasBeacon,
       has_probe: hasProbe,
       has_shovel: hasShovel,
+      has_radio: hasRadio,
+      has_satellite: hasSatellite,
+      has_first_aid: hasFirstAid,
       fitness_level: fitnessLevel as 'moderate' | 'fit' | 'very_fit' | 'athlete' | null || null,
       typical_start_time: typicalStartTime || null,
       preferred_zones: preferredZones,
@@ -453,6 +462,37 @@ export default function ProfilePage() {
                 className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <span className="text-gray-700">Shovel</span>
+            </label>
+          </div>
+
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 mt-6">Communication & Safety</h2>
+          <div className="flex flex-wrap gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={hasRadio}
+                onChange={(e) => setHasRadio(e.target.checked)}
+                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-gray-700">Radio</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={hasSatellite}
+                onChange={(e) => setHasSatellite(e.target.checked)}
+                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-gray-700">Satellite Communicator</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={hasFirstAid}
+                onChange={(e) => setHasFirstAid(e.target.checked)}
+                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-gray-700">First Aid Kit</span>
             </label>
           </div>
         </div>
