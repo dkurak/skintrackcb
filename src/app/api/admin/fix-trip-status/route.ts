@@ -1,10 +1,19 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
+
+// Use service role for admin operations (bypasses RLS)
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_KEY!,
+  { auth: { autoRefreshToken: false, persistSession: false } }
+);
 
 export async function POST() {
-  if (!supabase) {
-    return NextResponse.json({ error: 'Supabase not configured' }, { status: 500 });
+  if (!process.env.SUPABASE_SERVICE_KEY) {
+    return NextResponse.json({ error: 'Service key not configured' }, { status: 500 });
   }
+
+  const supabase = supabaseAdmin;
 
   // Get all tour posts with open or full status
   const { data: trips, error: tripsError } = await supabase
@@ -67,9 +76,11 @@ export async function POST() {
 
 // GET to preview what would be fixed (dry run)
 export async function GET() {
-  if (!supabase) {
-    return NextResponse.json({ error: 'Supabase not configured' }, { status: 500 });
+  if (!process.env.SUPABASE_SERVICE_KEY) {
+    return NextResponse.json({ error: 'Service key not configured' }, { status: 500 });
   }
+
+  const supabase = supabaseAdmin;
 
   // Get all tour posts with open or full status
   const { data: trips, error: tripsError } = await supabase
