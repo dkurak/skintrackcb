@@ -3,10 +3,13 @@ import { ExperienceLevel } from '@/lib/constants';
 interface ExperienceIconProps {
   level: ExperienceLevel;
   size?: 'sm' | 'lg';
+  variant?: 'default' | 'light'; // 'light' for use on dark backgrounds
 }
 
-export function ExperienceIcon({ level, size = 'sm' }: ExperienceIconProps) {
+export function ExperienceIcon({ level, size = 'sm', variant = 'default' }: ExperienceIconProps) {
   const sizeClass = size === 'lg' ? 'w-5 h-5' : 'w-4 h-4';
+  // For advanced/expert diamonds on dark backgrounds, use white
+  const diamondColor = variant === 'light' ? 'text-white' : 'text-gray-900';
 
   switch (level) {
     case 'beginner':
@@ -24,21 +27,21 @@ export function ExperienceIcon({ level, size = 'sm' }: ExperienceIconProps) {
         </svg>
       );
     case 'advanced':
-      // Black diamond (white fill for visibility on dark bg)
+      // Black diamond
       return (
-        <svg className={sizeClass} viewBox="0 0 24 24" fill="white">
-          <path d="M12 2L22 12L12 22L2 12L12 2Z" />
+        <svg className={sizeClass} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L22 12L12 22L2 12L12 2Z" className={diamondColor} />
         </svg>
       );
     case 'expert':
       // Double black diamond (two side-by-side diamonds)
       return (
         <span className="inline-flex gap-0.5">
-          <svg className={sizeClass} viewBox="0 0 24 24" fill="white">
-            <path d="M12 2L22 12L12 22L2 12L12 2Z" />
+          <svg className={sizeClass} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L22 12L12 22L2 12L12 2Z" className={diamondColor} />
           </svg>
-          <svg className={sizeClass} viewBox="0 0 24 24" fill="white">
-            <path d="M12 2L22 12L12 22L2 12L12 2Z" />
+          <svg className={sizeClass} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L22 12L12 22L2 12L12 2Z" className={diamondColor} />
           </svg>
         </span>
       );

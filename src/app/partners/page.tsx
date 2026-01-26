@@ -235,7 +235,7 @@ export default function PartnersPage() {
                 >
                   <div className="text-xs font-medium">{EXPERIENCE_LABELS[level]}</div>
                   <div className="flex items-center gap-1">
-                    <ExperienceIcon level={level} size="lg" />
+                    <ExperienceIcon level={level} size="lg" variant={level === 'advanced' || level === 'expert' ? 'light' : 'default'} />
                     <span className="text-lg font-bold">{count}</span>
                   </div>
                 </button>
