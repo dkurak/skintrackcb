@@ -365,6 +365,7 @@ export async function getTourPost(idOrShortId: string): Promise<TourPost | null>
       *,
       profiles (
         display_name,
+        avatar_url,
         experience_level,
         certifications
       )

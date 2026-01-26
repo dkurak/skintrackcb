@@ -159,12 +159,11 @@ export default function TourPostPage() {
       setPost(postData);
       if (postData) {
         setPlanningNotes(postData.planning_notes || '');
-      }
-
-      if (postData) {
+        // Use the full UUID from the loaded post for subsequent queries
+        const fullId = postData.id;
         const [responseData, participantData] = await Promise.all([
-          getTourResponses(postId),
-          getTourParticipants(postId),
+          getTourResponses(fullId),
+          getTourParticipants(fullId),
         ]);
         setResponses(responseData);
         setParticipants(participantData);
@@ -184,21 +183,21 @@ export default function TourPostPage() {
 
       if (!userIsParticipant) return;
 
-      // Load messages
-      const messagesData = await getTourMessages(postId);
+      // Load messages - use post.id (full UUID) not postId (short ID from URL)
+      const messagesData = await getTourMessages(post.id);
       setMessages(messagesData);
 
       // Load contact info if tour is confirmed
       if (post.status === 'confirmed' || post.status === 'completed') {
-        const contactData = await getTourParticipantsWithContact(postId, post.user_id);
+        const contactData = await getTourParticipantsWithContact(post.id, post.user_id);
         setParticipantsWithContact(contactData);
       }
     }
     loadParticipantData();
-  }, [post, user, responses, postId]);
+  }, [post, user, responses]);
 
   const handleSubmitInterest = async () => {
-    if (!user) {
+    if (!user || !post) {
       router.push('/login');
       return;
     }
@@ -206,7 +205,7 @@ export default function TourPostPage() {
     setIsSubmitting(true);
     setError(null);
 
-    const { error: submitError } = await createTourResponse(postId, user.id, message);
+    const { error: submitError } = await createTourResponse(post.id, user.id, message);
 
     if (submitError) {
       setError(submitError.message);
@@ -214,7 +213,7 @@ export default function TourPostPage() {
       setSuccess('Your interest has been submitted!');
       setMessage('');
       // Refresh responses
-      const responseData = await getTourResponses(postId);
+      const responseData = await getTourResponses(post.id);
       setResponses(responseData);
     }
 
@@ -222,13 +221,14 @@ export default function TourPostPage() {
   };
 
   const handleResponseUpdate = async (responseId: string, status: 'accepted' | 'declined') => {
+    if (!post) return;
     const { error: updateError } = await updateTourResponseStatus(responseId, status);
 
     if (!updateError) {
       // Refresh responses and participants
       const [responseData, participantData] = await Promise.all([
-        getTourResponses(postId),
-        getTourParticipants(postId),
+        getTourResponses(post.id),
+        getTourParticipants(post.id),
       ]);
       setResponses(responseData);
       setParticipants(participantData);
@@ -236,11 +236,12 @@ export default function TourPostPage() {
   };
 
   const handleDelete = async () => {
+    if (!post) return;
     if (!confirm('Are you sure you want to delete this trip?')) {
       return;
     }
 
-    const { error: deleteError } = await deleteTourPost(postId);
+    const { error: deleteError } = await deleteTourPost(post.id);
 
     if (deleteError) {
       setError(deleteError.message);
@@ -250,27 +251,28 @@ export default function TourPostPage() {
   };
 
   const handleStatusChange = async (newStatus: 'confirmed' | 'completed') => {
-    const { error: statusError } = await updateTourStatus(postId, newStatus);
+    if (!post) return;
+    const { error: statusError } = await updateTourStatus(post.id, newStatus);
 
     if (statusError) {
       setError(statusError.message);
     } else {
       // Refresh post data
-      const postData = await getTourPost(postId);
+      const postData = await getTourPost(post.id);
       setPost(postData);
       // Load contact info if now confirmed
       if (postData && (postData.status === 'confirmed' || postData.status === 'completed')) {
-        const contactData = await getTourParticipantsWithContact(postId, postData.user_id);
+        const contactData = await getTourParticipantsWithContact(postData.id, postData.user_id);
         setParticipantsWithContact(contactData);
       }
     }
   };
 
   const handleSendMessage = async () => {
-    if (!user || !newMessage.trim()) return;
+    if (!user || !post || !newMessage.trim()) return;
 
     setIsSendingMessage(true);
-    const { data, error: msgError } = await createTourMessage(postId, user.id, newMessage.trim());
+    const { data, error: msgError } = await createTourMessage(post.id, user.id, newMessage.trim());
 
     if (msgError) {
       setError(msgError.message);
@@ -282,8 +284,9 @@ export default function TourPostPage() {
   };
 
   const handleSavePlanningNotes = async () => {
+    if (!post) return;
     setIsSavingNotes(true);
-    const { error: notesError } = await updateTourPlanningNotes(postId, planningNotes);
+    const { error: notesError } = await updateTourPlanningNotes(post.id, planningNotes);
 
     if (notesError) {
       setError(notesError.message);
