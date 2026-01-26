@@ -1,49 +1,63 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 
 export default function ResetPage() {
   const [status, setStatus] = useState('Clearing cached data...');
   const [cleared, setCleared] = useState<string[]>([]);
 
   useEffect(() => {
-    const clearedItems: string[] = [];
+    const doReset = async () => {
+      const clearedItems: string[] = [];
 
-    try {
-      // Clear all localStorage
-      const localStorageCount = localStorage.length;
-      localStorage.clear();
-      clearedItems.push(`localStorage (${localStorageCount} items)`);
+      try {
+        // Sign out of Supabase first (clears auth tokens properly)
+        if (supabase) {
+          try {
+            await supabase.auth.signOut({ scope: 'local' });
+            clearedItems.push('Supabase session');
+          } catch (e) {
+            console.error('Error signing out:', e);
+          }
+        }
 
-      // Clear all sessionStorage
-      const sessionStorageCount = sessionStorage.length;
-      sessionStorage.clear();
-      clearedItems.push(`sessionStorage (${sessionStorageCount} items)`);
+        // Clear all localStorage
+        const localStorageCount = localStorage.length;
+        localStorage.clear();
+        clearedItems.push(`localStorage (${localStorageCount} items)`);
 
-      // Try to clear caches if available
-      if ('caches' in window) {
-        caches.keys().then(names => {
-          names.forEach(name => {
-            caches.delete(name);
-          });
+        // Clear all sessionStorage
+        const sessionStorageCount = sessionStorage.length;
+        sessionStorage.clear();
+        clearedItems.push(`sessionStorage (${sessionStorageCount} items)`);
+
+        // Try to clear caches if available
+        if ('caches' in window) {
+          const names = await caches.keys();
+          for (const name of names) {
+            await caches.delete(name);
+          }
           if (names.length > 0) {
             clearedItems.push(`caches (${names.length} caches)`);
           }
-        });
-      }
+        }
 
-      setCleared(clearedItems);
-      setStatus('All cached data cleared!');
-    } catch (error) {
-      console.error('Reset error:', error);
-      setStatus('Error clearing data, but attempted cleanup.');
-    }
+        setCleared(clearedItems);
+        setStatus('All cached data cleared!');
+      } catch (error) {
+        console.error('Reset error:', error);
+        setStatus('Error clearing data, but attempted cleanup.');
+      }
+    };
+
+    doReset();
   }, []);
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center">
       <div className="text-center max-w-md">
-        <div className="text-2xl font-bold text-gray-900 mb-4">🔄 Reset Complete</div>
+        <div className="text-2xl font-bold text-gray-900 mb-4">Reset Complete</div>
         <div className="text-lg text-gray-700 mb-4">{status}</div>
 
         {cleared.length > 0 && (
@@ -51,7 +65,7 @@ export default function ResetPage() {
             <div className="mb-2">Cleared:</div>
             <ul className="space-y-1">
               {cleared.map((item, i) => (
-                <li key={i}>✓ {item}</li>
+                <li key={i}>{item}</li>
               ))}
             </ul>
           </div>
