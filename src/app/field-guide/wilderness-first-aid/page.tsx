@@ -192,6 +192,29 @@ export default function WildernessFirstAidPage() {
         </div>
       </section>
 
+      {/* Satellite SOS */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-3">Calling for Help: Satellite SOS</h2>
+        <div className="text-sm text-gray-700 space-y-3">
+          <p>
+            Cell service is unreliable to nonexistent in most of the Elk Mountains. A{' '}
+            <Link href="/field-guide/satellite-sos" className="text-blue-600 hover:underline">satellite communicator</Link>{' '}
+            (Garmin inReach, SPOT, or PLB) should be in your pack on every backcountry trip. When someone is seriously injured
+            and can&apos;t self-evacuate, it&apos;s the difference between a quick rescue and hours of uncertainty.
+          </p>
+          <p>
+            <strong>When to activate SOS:</strong> Life-threatening injury or illness, a missing person you can&apos;t find,
+            or conditions that threaten survival and you cannot self-rescue. Don&apos;t hesitate &mdash; search and rescue would rather
+            respond to a call that turns out less serious than not be called at all.
+          </p>
+          <p>
+            See the full{' '}
+            <Link href="/field-guide/satellite-sos" className="text-blue-600 hover:underline font-medium">Satellite SOS Guide</Link>{' '}
+            for device details, step-by-step activation, and what to expect after you press the button.
+          </p>
+        </div>
+      </section>
+
       {/* Emergency Contacts */}
       <section className="bg-blue-50 border border-blue-200 rounded-xl p-6">
         <h2 className="text-lg font-semibold text-blue-900 mb-3">Crested Butte Area Emergency Contacts</h2>
