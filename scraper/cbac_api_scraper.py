@@ -174,8 +174,18 @@ def get_weather_by_id(weather_id: int) -> Optional[Dict]:
 def parse_weather_data(weather_data: Dict) -> Optional[Dict[str, Any]]:
     """Parse weather product into clean format."""
     try:
-        weather_list = weather_data.get('weather_data', [])
+        weather_list = weather_data.get('weather_data')
+
+        # Handle different types of weather_data:
+        # - None: no weather data
+        # - dict with 'weather_product_id': just a reference, no actual data
+        # - list: actual weather data
         if not weather_list:
+            return None
+        if isinstance(weather_list, dict):
+            # This is just a reference to another product, not actual data
+            return None
+        if not isinstance(weather_list, list) or len(weather_list) == 0:
             return None
 
         wd = weather_list[0]
