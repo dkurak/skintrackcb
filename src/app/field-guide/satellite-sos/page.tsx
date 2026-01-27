@@ -46,12 +46,18 @@ export default function SatelliteSOSPage() {
               No messaging &mdash; just an SOS with GPS coordinates.
             </p>
           </div>
-          <div className="border border-gray-200 rounded-lg p-4">
-            <h3 className="font-semibold text-gray-900">Apple iPhone 14+ / Satellite SOS</h3>
-            <p className="mt-1">
+          <div className="border border-amber-300 bg-amber-50 rounded-lg p-4">
+            <h3 className="font-semibold text-amber-900">Apple iPhone 14+ / Satellite SOS</h3>
+            <p className="mt-1 text-amber-800">
               Built-in Emergency SOS via satellite (Globalstar). Walks you through a questionnaire and sends details
               to emergency services. Free for 2 years with iPhone purchase. One-way emergency only &mdash; not for messaging.
             </p>
+            <div className="mt-3 p-3 bg-amber-100 border border-amber-300 rounded text-amber-900 text-sm">
+              <strong>Important:</strong> iPhone satellite SOS is not as reliable as dedicated devices. It requires a clear view of the sky,
+              can take several minutes to connect, and frequently fails in narrow valleys and heavy tree cover &mdash; exactly where
+              you&apos;re most likely to need it. <strong>Do not rely on an iPhone as your only emergency communication device in the backcountry.</strong>{' '}
+              Carry a dedicated satellite communicator (Garmin inReach, SPOT, or PLB) as your primary.
+            </div>
           </div>
         </div>
       </section>
