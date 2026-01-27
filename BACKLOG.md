@@ -127,12 +127,35 @@ _Features prioritized for upcoming work_
     - Each participant indicates what they're bringing
     - Visual indicator for gaps (e.g., "nobody bringing a tarp?")
 
-### Content
+### Content / Field Guide
 
-- [ ] **Radio Channel Guide**
-  - Common backcountry radio channels for CB area
-  - When/how to use them
-  - Could be static page or dynamic content
+- [x] **Radio Channel Guide** (Jan 2025)
+  - GMRS/FRS guide, channel reference, best practices
+  - At /field-guide/radio-channels
+
+- [x] **Wilderness First Aid Guide** (Jan 2025)
+  - Kit essentials, scene assessment, common backcountry injuries
+  - At /field-guide/wilderness-first-aid
+
+- [x] **4x4 Vehicle Recovery Guide** (Jan 2025)
+  - Gear, self-recovery techniques, CB area road notes
+  - At /field-guide/vehicle-recovery
+
+- [x] **Satellite SOS Guide** (Jan 2025)
+  - Device comparison, when/how to activate, post-activation flow
+  - At /field-guide/satellite-sos
+
+- [ ] **Going Alone / Solo Safety**
+  - Risks and realities of solo backcountry travel
+  - Trip planning: tell someone your plan, route, expected return time
+  - Reinforce the buddy/group system — why partners matter
+  - What to do if plans change or you're overdue
+  - Solo-specific gear considerations (satellite communicator is non-negotiable)
+  - Link to Trips page as CTA for finding partners
+
+- [ ] **H&H Towing info** — add contact number and details to 4x4 recovery page
+- [ ] **Course signup links** — add WFA/WFR/AIARE course links to first aid and avalanche pages
+- [ ] **Popular routes section** — add to 4x4 recovery page
 
 ### Technical / Infrastructure
 
@@ -166,6 +189,9 @@ _Shipped features (for reference)_
   - Database-driven feature flags for activities and features
   - Admin UI toggle switches at /admin
   - Enables gradual rollout (ski touring first, add hiking later)
+- [x] **Vercel Speed Insights** (Jan 2025)
+- [x] **Field Guide section** (Jan 2025) — Radio, First Aid, 4x4 Recovery, Satellite SOS
+- [x] **Withdraw from Trip** (Jan 2025) — Participants can leave trips, notifications sent
 - [x] Vercel Analytics for page views (Jan 2025)
 - [x] Trend analysis in forecasts - improving/steady/worsening (Jan 2025)
 - [x] Admin area with trailhead management (Jan 2025)

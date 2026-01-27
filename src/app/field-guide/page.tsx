@@ -81,6 +81,17 @@ export default function FieldGuidePage() {
         ))}
       </div>
 
+      {/* Buddy system callout */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+        <h2 className="font-semibold text-blue-900 mb-1">The #1 Rule: Don&apos;t Go Alone</h2>
+        <p className="text-sm text-blue-800">
+          The best gear and knowledge mean less without a partner. Always travel with a buddy or group,
+          tell someone where you&apos;re going and when you expect to be back, and have a plan for what happens
+          if you don&apos;t check in.{' '}
+          <Link href="/trips" className="font-medium underline hover:text-blue-900">Find a crew for your next trip.</Link>
+        </p>
+      </div>
+
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
         <strong>Disclaimer:</strong> These guides are for general reference only and do not replace
         formal training. Always take certified courses (WFR, AIARE, etc.) and practice skills
