@@ -212,6 +212,9 @@ export default function SoloSafetyPage() {
         <h2 className="text-lg font-semibold text-gray-900 mb-3">What Your Emergency Contact Needs to Know</h2>
         <p className="text-sm text-gray-600 mb-4">
           Your emergency contact is your safety net. Give them what they need to help you if something goes wrong.
+          Add your emergency contacts to your{' '}
+          <Link href="/profile" className="text-blue-600 hover:underline font-medium">profile</Link>{' '}
+          so your trip partners know who to reach if something happens in the field.
         </p>
         <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-700 space-y-2">
           <p><strong>Share before every trip:</strong></p>

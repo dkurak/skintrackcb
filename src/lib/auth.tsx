@@ -4,6 +4,12 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 
+interface EmergencyContact {
+  name: string;
+  phone: string;
+  relationship: string;
+}
+
 interface Profile {
   id: string;
   email: string | null;
@@ -32,6 +38,7 @@ interface Profile {
   show_email: boolean;
   show_phone: boolean;
   show_on_tours: boolean;
+  emergency_contacts: EmergencyContact[];
   is_test_user: boolean;
   is_admin: boolean;
   created_at: string;

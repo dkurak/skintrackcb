@@ -74,6 +74,7 @@ export default function ProfilePage() {
   const [lookingForPartners, setLookingForPartners] = useState(false);
   const [showOnTours, setShowOnTours] = useState(true);
   const [bio, setBio] = useState('');
+  const [emergencyContacts, setEmergencyContacts] = useState<{ name: string; phone: string; relationship: string }[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [trailheads, setTrailheads] = useState<Trailhead[]>([]);
@@ -106,6 +107,7 @@ export default function ProfilePage() {
       setLookingForPartners(profile.looking_for_partners || false);
       setShowOnTours(profile.show_on_tours !== false);
       setBio(profile.bio || '');
+      setEmergencyContacts(profile.emergency_contacts || []);
     }
   }, [profile]);
 
@@ -159,6 +161,7 @@ export default function ProfilePage() {
       looking_for_partners: lookingForPartners,
       show_on_tours: showOnTours,
       bio: bio || null,
+      emergency_contacts: emergencyContacts.filter(c => c.name.trim() || c.phone.trim()),
     });
 
     setIsSaving(false);
@@ -494,6 +497,75 @@ export default function ProfilePage() {
               />
               <span className="text-gray-700">First Aid Kit</span>
             </label>
+          </div>
+        </div>
+
+        {/* Emergency Contacts */}
+        <div className="border-t border-gray-200 pt-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">Emergency Contacts</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Visible to your trip partners so they know who to contact if something goes wrong in the field.
+          </p>
+          <div className="space-y-3">
+            {emergencyContacts.map((contact, index) => (
+              <div key={index} className="flex gap-2 items-start">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 flex-1">
+                  <input
+                    type="text"
+                    value={contact.name}
+                    onChange={(e) => {
+                      const updated = [...emergencyContacts];
+                      updated[index] = { ...updated[index], name: e.target.value };
+                      setEmergencyContacts(updated);
+                    }}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                    placeholder="Name"
+                  />
+                  <input
+                    type="tel"
+                    value={contact.phone}
+                    onChange={(e) => {
+                      const updated = [...emergencyContacts];
+                      updated[index] = { ...updated[index], phone: e.target.value };
+                      setEmergencyContacts(updated);
+                    }}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                    placeholder="Phone number"
+                  />
+                  <input
+                    type="text"
+                    value={contact.relationship}
+                    onChange={(e) => {
+                      const updated = [...emergencyContacts];
+                      updated[index] = { ...updated[index], relationship: e.target.value };
+                      setEmergencyContacts(updated);
+                    }}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                    placeholder="Relationship (e.g. spouse, parent)"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEmergencyContacts(emergencyContacts.filter((_, i) => i !== index))}
+                  className="mt-1 p-1.5 text-gray-400 hover:text-red-600 transition-colors"
+                  title="Remove contact"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => setEmergencyContacts([...emergencyContacts, { name: '', phone: '', relationship: '' }])}
+              className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add Emergency Contact
+            </button>
           </div>
         </div>
 

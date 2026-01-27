@@ -218,6 +218,11 @@ export default function WildernessFirstAidPage() {
       {/* Emergency Contacts */}
       <section className="bg-blue-50 border border-blue-200 rounded-xl p-6">
         <h2 className="text-lg font-semibold text-blue-900 mb-3">Crested Butte Area Emergency Contacts</h2>
+        <p className="text-sm text-blue-700 mb-3">
+          Add your personal emergency contacts to your{' '}
+          <Link href="/profile" className="font-medium underline hover:text-blue-900">profile</Link>{' '}
+          so trip partners know who to reach on your behalf.
+        </p>
         <div className="grid sm:grid-cols-2 gap-3 text-sm">
           <div>
             <p className="font-medium text-blue-900">911 (Emergency)</p>

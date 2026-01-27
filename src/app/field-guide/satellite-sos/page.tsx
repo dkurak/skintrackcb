@@ -187,7 +187,8 @@ export default function SatelliteSOSPage() {
           </li>
           <li className="flex gap-2">
             <span className="text-blue-600 font-bold flex-shrink-0">&#x2713;</span>
-            <span><strong>Update your emergency contacts</strong> in the device or associated app. Include someone who knows your plans.</span>
+            <span><strong>Update your emergency contacts</strong> in the device or associated app and on your{' '}
+              <Link href="/profile" className="text-blue-600 hover:underline">profile</Link>. Include someone who knows your plans.</span>
           </li>
           <li className="flex gap-2">
             <span className="text-blue-600 font-bold flex-shrink-0">&#x2713;</span>
