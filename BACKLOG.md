@@ -60,7 +60,7 @@ _Features prioritized for upcoming work_
 
 ### User Features
 
-- [ ] **Profile Picture Upload**
+- [x] **Profile Picture Upload** (Jan 2025)
   - Use Supabase Storage (free tier: 1GB)
   - Upload component on profile edit page
   - Display in nav bar next to name
@@ -100,7 +100,7 @@ _Features prioritized for upcoming work_
 - [ ] **Trip Confirmation & Planning Mode**
   - Trip lifecycle: Proposed → On → (Planning) → Completed
 
-  **Confirm Trip (Organizer action)**
+- [x] **Confirm Trip (Organizer action)** (Jan 2026)
   - Manual "Confirm Trip" / "Trip is On" button for organizer
   - Notifies all accepted participants (in-app, future: email option)
   - Visual indicators:
@@ -108,7 +108,7 @@ _Features prioritized for upcoming work_
     - Badge/tag on trip cards in listings
   - Unlocks planning features below
 
-  **The Brief (AIARE-style pre-trip planning)**
+- [ ] **The Brief (AIARE-style pre-trip planning)**
   - Structured discussion framework for the group
   - Elements (refine from AIARE field book):
     - Conditions summary (pull from forecast if available)
@@ -118,7 +118,7 @@ _Features prioritized for upcoming work_
     - Emergency plan / communication protocol
   - TODO: Reference AIARE field book for exact structure
 
-  **Gear Coordination**
+- [ ] **Gear Coordination**
   - Essentials (radio, satellite, first aid):
     - Pre-filled from user profile settings
     - Requires conscious confirmation per trip (not auto-assumed)
@@ -145,13 +145,14 @@ _Features prioritized for upcoming work_
   - Device comparison, when/how to activate, post-activation flow
   - At /field-guide/satellite-sos
 
-- [ ] **Going Alone / Solo Safety**
+- [x] **Going Alone / Solo Safety** (Jan 2025)
   - Risks and realities of solo backcountry travel
   - Trip planning: tell someone your plan, route, expected return time
   - Reinforce the buddy/group system — why partners matter
   - What to do if plans change or you're overdue
   - Solo-specific gear considerations (satellite communicator is non-negotiable)
   - Link to Trips page as CTA for finding partners
+  - At /field-guide/solo-safety
 
 - [ ] **H&H Towing info** — add contact number and details to 4x4 recovery page
 - [ ] **Course signup links** — add WFA/WFR/AIARE course links to first aid and avalanche pages
