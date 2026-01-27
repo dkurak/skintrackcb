@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
-  <!-- Background - Storm Day slate -->
-  <rect width="180" height="180" rx="40" fill="#1e293b"/>
-  <!-- Stacked peaks -->
-  <path d="M28 140L68 50L108 140" stroke="white" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M84 140L124 72L164 140" stroke="white" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-</svg>

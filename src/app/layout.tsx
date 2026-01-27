@@ -62,6 +62,14 @@ export const metadata: Metadata = {
   verification: {
     google: 'vRkZMB6-LtHXg3ZwJpi3zqLjQJohbBdAzuSNqIW-bYo',
   },
+  appleWebApp: {
+    capable: true,
+    title: 'BC Crews',
+    statusBarStyle: 'black-translucent',
+  },
+  other: {
+    'mobile-web-app-capable': 'yes',
+  },
 };
 
 export default function RootLayout({
