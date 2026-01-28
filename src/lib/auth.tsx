@@ -96,10 +96,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const startTime = Date.now();
 
     // Add timeout to profile fetch - 10s should be plenty
-    const timeoutPromise = new Promise<null>((resolve) => {
-      setTimeout(() => {
+    let timeoutId: NodeJS.Timeout;
+    let didTimeout = false;
+
+    const timeoutPromise = new Promise<{ data: null; error: Error }>((resolve) => {
+      timeoutId = setTimeout(() => {
+        didTimeout = true;
         console.error('fetchProfile: TIMEOUT after 10s');
-        resolve(null);
+        resolve({ data: null, error: new Error('Profile fetch timed out after 10s') });
       }, 10000);
     });
 
@@ -110,14 +114,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('id', userId)
         .single();
 
-      console.log('fetchProfile: query completed in', Date.now() - startTime, 'ms');
+      // Clear timeout if fetch completed first
+      clearTimeout(timeoutId);
+      if (!didTimeout) {
+        console.log('fetchProfile: query completed in', Date.now() - startTime, 'ms');
+      }
       return { data, error };
     })();
 
-    const result = await Promise.race([
-      fetchPromise,
-      timeoutPromise.then(() => ({ data: null, error: new Error('Profile fetch timed out after 10s') }))
-    ]);
+    const result = await Promise.race([fetchPromise, timeoutPromise]);
 
     if (!result || result.data === null) {
       if (result?.error) {
@@ -190,18 +195,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let mounted = true;
 
     // Timeout to prevent infinite loading - 15 seconds max
-    const timeout = setTimeout(() => {
+    let authTimeoutId: NodeJS.Timeout | null = setTimeout(() => {
       if (mounted && loading) {
         console.warn('Auth initialization timed out after 15s');
         initialLoadCompleteRef.current = true;
         setLoading(false);
       }
+      authTimeoutId = null;
     }, 15000);
 
     // Get initial session
     supabase.auth.getSession()
       .then(async ({ data: { session }, error }) => {
         if (!mounted) return;
+        // Clear the timeout since we got a response
+        if (authTimeoutId) {
+          clearTimeout(authTimeoutId);
+          authTimeoutId = null;
+        }
         if (error) {
           console.error('Error getting session:', error);
           setLoading(false);
@@ -220,6 +231,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       .catch((err) => {
         console.error('Auth initialization error:', err);
+        if (authTimeoutId) {
+          clearTimeout(authTimeoutId);
+          authTimeoutId = null;
+        }
         if (mounted) setLoading(false);
       });
 
@@ -257,7 +272,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       mounted = false;
-      clearTimeout(timeout);
+      if (authTimeoutId) clearTimeout(authTimeoutId);
       subscription.unsubscribe();
     };
   }, []);
