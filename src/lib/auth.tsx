@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useRef, ReactNode } from 'react';
 import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 
@@ -65,13 +65,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch user profile with timeout
+  // Track ongoing profile fetch to prevent duplicates
+  const fetchingProfileRef = useRef<string | null>(null);
+  const profileCacheRef = useRef<{ userId: string; profile: Profile; timestamp: number } | null>(null);
+
+  // Fetch user profile with timeout and deduplication
   const fetchProfile = async (userId: string) => {
     if (!supabase) {
       console.error('fetchProfile: supabase client is null');
       return null;
     }
 
+    // Check cache first (valid for 5 seconds to dedupe rapid calls)
+    const cache = profileCacheRef.current;
+    if (cache && cache.userId === userId && Date.now() - cache.timestamp < 5000) {
+      console.log('fetchProfile: returning cached profile for', userId);
+      return cache.profile;
+    }
+
+    // If already fetching for this user, skip duplicate request
+    if (fetchingProfileRef.current === userId) {
+      console.log('fetchProfile: already fetching for', userId, '- skipping duplicate');
+      return null;
+    }
+
+    fetchingProfileRef.current = userId;
     console.log('fetchProfile: fetching for userId:', userId);
     const startTime = Date.now();
 
@@ -104,6 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (result?.error) {
         console.error('fetchProfile: error:', result.error);
       }
+      fetchingProfileRef.current = null;
       return null;
     }
 
@@ -129,17 +148,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             .select('*')
             .eq('id', userId)
             .single();
-          if (!retryError) {
-            return retryData as Profile;
+          if (!retryError && retryData) {
+            const retryProfile = retryData as Profile;
+            profileCacheRef.current = { userId, profile: retryProfile, timestamp: Date.now() };
+            fetchingProfileRef.current = null;
+            return retryProfile;
           }
           console.error('Retry also failed:', retryError);
         }
       }
+      fetchingProfileRef.current = null;
       return null;
     }
 
     console.log('fetchProfile: got profile data:', data?.display_name);
-    return data as Profile;
+    const profileData = data as Profile;
+
+    // Cache the result
+    profileCacheRef.current = { userId, profile: profileData, timestamp: Date.now() };
+    fetchingProfileRef.current = null;
+
+    return profileData;
   };
 
   // Refresh profile data
@@ -195,6 +224,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, session: Session | null) => {
         if (!mounted) return;
+
+        // Skip INITIAL_SESSION - we handle that with getSession() above
+        // This prevents duplicate profile fetches on page load
+        if (event === 'INITIAL_SESSION') {
+          console.log('onAuthStateChange: skipping INITIAL_SESSION (handled by getSession)');
+          return;
+        }
+
+        console.log('onAuthStateChange:', event);
         setSession(session);
         setUser(session?.user ?? null);
 
