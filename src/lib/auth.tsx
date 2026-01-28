@@ -96,85 +96,70 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const startTime = Date.now();
 
     // Add timeout to profile fetch - 10s should be plenty
-    let timeoutId: NodeJS.Timeout;
     let didTimeout = false;
+    const timeoutId = setTimeout(() => {
+      didTimeout = true;
+      console.error('fetchProfile: TIMEOUT after 10s');
+    }, 10000);
 
-    const timeoutPromise = new Promise<{ data: null; error: Error }>((resolve) => {
-      timeoutId = setTimeout(() => {
-        didTimeout = true;
-        console.error('fetchProfile: TIMEOUT after 10s');
-        resolve({ data: null, error: new Error('Profile fetch timed out after 10s') });
-      }, 10000);
-    });
-
-    const fetchPromise = (async () => {
+    try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
 
-      // Clear timeout if fetch completed first
       clearTimeout(timeoutId);
-      if (!didTimeout) {
-        console.log('fetchProfile: query completed in', Date.now() - startTime, 'ms');
+
+      if (didTimeout) {
+        // Timeout fired while we were waiting - treat as failure
+        fetchingProfileRef.current = null;
+        return null;
       }
-      return { data, error };
-    })();
 
-    const result = await Promise.race([fetchPromise, timeoutPromise]);
+      console.log('fetchProfile: query completed in', Date.now() - startTime, 'ms');
 
-    if (!result || result.data === null) {
-      if (result?.error) {
-        console.error('fetchProfile: error:', result.error);
-      }
-      fetchingProfileRef.current = null;
-      return null;
-    }
+      if (error) {
+        console.error('Error fetching profile:', error);
+        const errorCode = 'code' in error ? (error as { code?: string }).code : undefined;
 
-    const { data, error } = result;
-
-    if (error) {
-      console.error('Error fetching profile:', error);
-      const errorCode = 'code' in error ? (error as { code?: string }).code : undefined;
-      const errorDetails = 'details' in error ? (error as { details?: string }).details : undefined;
-      console.error('Error details:', { code: errorCode, message: error.message, details: errorDetails });
-
-      // Check if this is an auth error - token might be invalid
-      if (errorCode === 'PGRST301' || error.message?.includes('JWT')) {
-        console.error('Auth token may be invalid, attempting to refresh session...');
-        const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-        if (refreshError) {
-          console.error('Failed to refresh session:', refreshError);
-        } else if (refreshData.session) {
-          console.log('Session refreshed, retrying profile fetch...');
-          // Retry the fetch
-          const { data: retryData, error: retryError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', userId)
-            .single();
-          if (!retryError && retryData) {
-            const retryProfile = retryData as Profile;
-            profileCacheRef.current = { userId, profile: retryProfile, timestamp: Date.now() };
-            fetchingProfileRef.current = null;
-            return retryProfile;
+        // Check if this is an auth error - token might be invalid
+        if (errorCode === 'PGRST301' || error.message?.includes('JWT')) {
+          console.error('Auth token may be invalid, attempting to refresh session...');
+          const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+          if (!refreshError && refreshData.session) {
+            console.log('Session refreshed, retrying profile fetch...');
+            const { data: retryData, error: retryError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', userId)
+              .single();
+            if (!retryError && retryData) {
+              const retryProfile = retryData as Profile;
+              profileCacheRef.current = { userId, profile: retryProfile, timestamp: Date.now() };
+              fetchingProfileRef.current = null;
+              return retryProfile;
+            }
           }
-          console.error('Retry also failed:', retryError);
         }
+        fetchingProfileRef.current = null;
+        return null;
       }
+
+      console.log('fetchProfile: got profile data:', data?.display_name);
+      const profileData = data as Profile;
+
+      // Cache the result
+      profileCacheRef.current = { userId, profile: profileData, timestamp: Date.now() };
+      fetchingProfileRef.current = null;
+
+      return profileData;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      console.error('fetchProfile: unexpected error:', err);
       fetchingProfileRef.current = null;
       return null;
     }
-
-    console.log('fetchProfile: got profile data:', data?.display_name);
-    const profileData = data as Profile;
-
-    // Cache the result
-    profileCacheRef.current = { userId, profile: profileData, timestamp: Date.now() };
-    fetchingProfileRef.current = null;
-
-    return profileData;
   };
 
   // Refresh profile data
